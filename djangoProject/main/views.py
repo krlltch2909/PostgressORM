@@ -1,3 +1,4 @@
+import datetime
 from typing import Optional
 from django.http import request
 from psycopg2 import sql
@@ -16,7 +17,7 @@ def init_connection(user: str, password: str):
     conn = psycopg2.connect(dbname='demo',
                             user=user,
                             password=password,
-                            host='localhost',
+                            host='95.165.30.171',
                             port='54321'
                             )
 
@@ -82,8 +83,8 @@ class TasksApiView(APIView):
             rez = {
                 'task_number': i[1],
                 'date_of_creation': i[2],
-                'date_of_complection': i[3],
-                'therme_of_execution': i[4],
+                'date_of_completion': i[3],
+                'term_of_execution': i[4],
                 'contact_number': i[0],
                 'author_number': i[5],
                 'performer_number': i[6],
@@ -99,8 +100,6 @@ class TasksApiView(APIView):
         return Response({'tasks': tasksList})
 
     def post(self, request):
-
-        print(request.data['ssssss'])
         login = self.request.query_params.get('username')
         password = self.request.query_params.get('password')
 
@@ -113,8 +112,12 @@ class TasksApiView(APIView):
         except Exception:
             return Response({"error": "body was incorrect"})
 
+        # Переводим дату в нужный формат из строки
+        term_of_execution = datetime.date(*map(int, term_of_execution.split('-')))
+        if term_of_execution < datetime.date.today():
+            return Response({"error": "term_of_execution must be greater than today"})
 
-        if performer_number ==  '':
+        if performer_number == '':
             sql_script = sql.SQL(
             f"INSERT INTO tasks(term_of_execution, contract_number, author_number, priority_code, task_type_code) VALUES ('{term_of_execution}', {contract_number}, 1 , {priority_code}, {task_type_code})")
         else: 
@@ -137,7 +140,7 @@ class TasksApiView(APIView):
             id: int = request.data['id']
            # if request.data['performer_number'] 
             update_dictperformer_number = request.data['performer_number']
-            update_dict[id] = update_dictperformer_number}
+            update_dict[id] = update_dictperformer_number
         except Exception:
             return Response({"error": "body was incorrect"})
         
@@ -147,7 +150,8 @@ class TasksApiView(APIView):
             sql_script += one_update_script
         sql_script += f"WHERE id={id}"
 
-        return Response(response_data)
+        #return Response(response_data)
+        return Response('HUI')
 
 
 

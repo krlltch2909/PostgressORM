@@ -5,7 +5,7 @@ def main():
     conn = pg.connect(dbname='demo',
                       user='ann',
                       password='qwerty',
-                      host='localhost',
+                      host='95.165.30.171',
                       port='54321'
                       )
 
