@@ -10,9 +10,13 @@
 
     <div class="select__name">
       <h8>Term of execution</h8>
-      <input id="date" type="date"
-             class="date__input"
-             v-model="task.term_of_execution">
+      <!-- TODO: Исправить Datepicker -->
+      <Datepicker
+          v-model="task.term_of_execution"
+          :format="DatePickerFormat"
+          :disable-time-range-validation="true"
+          :disabled-dates="disableDates"
+             />
     </div>
 
 
@@ -64,9 +68,10 @@
 
 <script>
 import MySelect from "@/components/UA/MySelect";
+import Datepicker from '@vuepic/vue-datepicker';
 export default {
   name: "my-create-task",
-  components: {MySelect},
+  components: {MySelect, Datepicker},
   props:{
     all_task_type_codes:{
       type: Array
@@ -98,6 +103,8 @@ export default {
         task_type_code: '',
         performer_id: '',
       },
+      DatePickerFormat: 'YYYY-MM-DD',
+      disableDates: new Date(Date.now()),
       contract: {
         contract_details: '',
         vin: '',

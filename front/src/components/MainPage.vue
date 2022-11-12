@@ -208,13 +208,13 @@ export default {
             id: element['task_number'],
             author_number:element['author_number'],
             contact_number: element['contact_number'],
-            date_of_complection: element['date_of_complection'],
+            date_of_completion: element['date_of_completion'],
             date_of_creation: element['date_of_creation'],
             performer_number: element['performer_number'],
             priority_code: element['priority_code'],
             status: element['status'],
             task_type_code: element['task_type_code'],
-            therme_of_execution: element['therme_of_execution']
+            term_of_execution: element['term_of_execution']
           }
           if (newTask.contact_number !== null){
             const contract = {
