@@ -25,6 +25,7 @@ export default {
 
   methods:{
     changeOption(event){
+
       this.$emit('update:modelValue', event.target.value)
     },
   }

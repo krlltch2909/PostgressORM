@@ -40,6 +40,8 @@
       <my-dialog v-model:show="add_task_dialog_visible">
         <my-create-task :all_priority_codes="priority_codes"
                         :all_task_type_codes="tasks_type_classifier"
+                        :all_employees="employees"
+                        :role="dbRole"
                         @createTask="createTask"
         />
       </my-dialog>
@@ -107,6 +109,7 @@ export default {
     changeUser(){
       this.username = ''
       this.password = ''
+      this.dbRole = ''
       this.tasks = []
       this.isLogin = false
     },
@@ -138,9 +141,9 @@ export default {
           task.contract_number = response.data['id'][0][0]
         }
 
-
-
         const url_for_task_add = 'http://localhost:8000/api/tasks/?username=' + this.username + '&password=' + this.password
+
+        console.log(task)
 
         let taskFormData = new FormData();
 
@@ -148,6 +151,7 @@ export default {
         taskFormData.append('contract_number', task.contract_number);
         taskFormData.append('priority_code', task.priority_code);
         taskFormData.append('task_type_code', task.task_type_code );
+        taskFormData.append('performer_number', task.performer_id);
 
 
         await axios.post(url_for_task_add, taskFormData, this.config)
@@ -321,7 +325,7 @@ export default {
         array.forEach((element)=> {
           const newEmployee = {
             id: element['employee_id'],
-            login: element['login'],
+            value: element['login'],  // value = login
           }
           this.employees.push(newEmployee)
         })

@@ -5,7 +5,7 @@ from rest_framework import response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView, exception_handler
-
+from django.utils.datastructures import MultiValueDictKeyError
 import psycopg2
 
 
@@ -36,6 +36,8 @@ def execute_post_query(query: sql, login: str, password: str):
         cursor.execute("COMMIT")
     except psycopg2.errors.DuplicateObject:
         return {"error": "task eexists"}
+    except psycopg2.errors.InsufficientPrivilege:
+        return{"error": "permishon_denied"}
 
     return {"status": 200}
 
@@ -44,7 +46,7 @@ def execute_command(query: str, login: str, password: str) -> list:
     try:
         conn, cursor = init_connection(user=login, password=password)
     except psycopg2.OperationalError as e:
-        return {'error': 'incorect login or password'}
+        return {"error": "incorect login or password"}
 
         # cursor.execute("SELECT * FROM public.tasks "
         #                "JOIN public.task_type_classifier USING(task_type_code)")
@@ -97,20 +99,28 @@ class TasksApiView(APIView):
         return Response({'tasks': tasksList})
 
     def post(self, request):
+
+        print(request.data['ssssss'])
         login = self.request.query_params.get('username')
         password = self.request.query_params.get('password')
 
         try:
             term_of_execution = request.data['term_of_execution']
             contract_number: Optional[int] = request.data['contract_number']
-            # author_number: int = request.data['author_number']
             priority_code: int = request.data['priority_code']
             task_type_code: int = request.data['task_type_code']
+            performer_number = request.data['performer_number']
         except Exception:
             return Response({"error": "body was incorrect"})
 
-        sql_script = sql.SQL(
+
+        if performer_number ==  '':
+            sql_script = sql.SQL(
             f"INSERT INTO tasks(term_of_execution, contract_number, author_number, priority_code, task_type_code) VALUES ('{term_of_execution}', {contract_number}, 1 , {priority_code}, {task_type_code})")
+        else: 
+             sql_script = sql.SQL(
+            f"INSERT INTO tasks(term_of_execution, contract_number, author_number, performer_number, priority_code, task_type_code) VALUES ('{term_of_execution}', {contract_number}, 1 ,{performer_number}, {priority_code}, {task_type_code})")
+
 
         response_data = execute_post_query(query=sql_script,
                                            login=login,
@@ -118,13 +128,35 @@ class TasksApiView(APIView):
                                            )
         return Response(response_data)
 
+    def put(self, request):
+        login = self.request.query_params.get('username')
+        password = self.request.query_params.get('password')
+
+        update_dict = {}
+        try:
+            id: int = request.data['id']
+           # if request.data['performer_number'] 
+            update_dictperformer_number = request.data['performer_number']
+
+        except Exception:
+            return Response({"error": "body was incorrect"})
+        
+        sql_script = sql.SQL(f"UPDATE task SET ")
+        for key, value in update_dict.items():
+            one_update_script = f"{key}='{value}' "
+            sql_script += one_update_script
+        sql_script += f"WHERE id={id}"
+
+        return Response(response_data)
+
+
 
 # Api для типов заданий
 class TaskTypeApiView(APIView):
     permission_classes = [IsAuthenticated, ]
 
     def get(self, request):
-
+        
         login = 'elefant'
         password = 'kirka2906'
         sql_script = "SELECT * FROM public.task_type_classifier"
@@ -257,6 +289,7 @@ class UserApiView(APIView):
 
         sql_script = f"SELECT position_code FROM position_classifier WHERE " \
                      f" employee_position='{role_for_user}';"
+
 
         try:
             id_role = execute_command(sql_script, 'elefant', 'kirka2906')[0][0]

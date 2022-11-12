@@ -1,16 +1,46 @@
 <template>
   <div>
     <h3>Create new Task</h3>
-    <my-input
-        v-model.trim="task.term_of_execution"
-        placeholder="term of execution"/>
-    <my-select :options="all_task_type_codes" v-model="selectedTypeCode"/>
-    <my-select :options="all_priority_codes" v-model="selectedPriorityCode"/>
+
+    <div v-if="error !== ''">
+      <div class="alert alert-danger" role="alert">
+        {{error}}
+      </div>
+    </div>
+
+    <div class="select__name">
+      <h8>Term of execution</h8>
+      <input id="date" type="date"
+             class="date__input"
+             v-model="task.term_of_execution">
+    </div>
+
+
+    <div class="select__name">
+      <h9>Type codes</h9>
+      <my-select
+          :options="all_task_type_codes"
+          v-model="selectedTypeCode"/>
+    </div>
+
+
+    <div class="select__name">
+      <h9>Priority codes</h9>
+      <my-select
+          :options="all_priority_codes"
+          v-model="selectedPriorityCode"/>
+    </div>
+
+
+    <div  v-if="role !== 'worker'" class="select__name">
+      <h9>Performer user</h9>
+      <my-select :options="all_employees" v-model="performer_login"/>
+    </div>
 
     <div class="create__contract">
       <h8>Create New Contract</h8>
       <input class="form-check-input mt-0"
-             v-model="createNewContract" type="checkbox" value=""
+             v-model="createNewContract" type="checkbox"
              style="margin-left: auto"
              aria-label="Checkbox for following text input">
     </div>
@@ -43,20 +73,30 @@ export default {
     },
     all_priority_codes:{
       type: Array
+    },
+    role:{
+      type: String
+    },
+    all_employees:{
+      type: Array
     }
   },
 
   data() {
     return{
+      // input_date: Date,
       createNewContract: false,
-      selectedTypeCode: String,
-      selectedPriorityCode: String,
+      selectedTypeCode: '',
+      selectedPriorityCode: '',
+      performer_login: '',
+      error: '',
       task: {
         term_of_execution: '',
         contract_number: null,
         author_number: 1,
         priority_code: '',
-        task_type_code: ''
+        task_type_code: '',
+        performer_id: '',
       },
       contract: {
         contract_details: '',
@@ -68,9 +108,16 @@ export default {
   methods:{
     createNewTask(){
 
+      if (this.task.term_of_execution === ''){
+        this.error= "date must be chosen"
+        return
+      }
+      else {
+        this.error = ''
+      }
 
       if (this.selectedPriorityCode === ''){
-        alert("task priority must be chosen")
+        this.error= "task priority must be chosen"
         return
       }
 
@@ -86,11 +133,22 @@ export default {
         }
       }
 
+
       this.task.task_type_code = this.all_task_type_codes.find(el => el.value === this.selectedTypeCode)['id']
       this.task.priority_code = this.all_priority_codes.find(el => el.value === this.selectedPriorityCode)['id']
+
       if (this.createNewContract === true){
         this.task.contract_number = this.contract
       }
+
+      try{
+        this.task.performer_id = this.all_employees.find(el => el.value === this.performer_login)['id']
+      }
+      catch (e){
+        this.task.performer_id = ''
+      }
+
+
 
 
       this.$emit('createTask', this.task)
@@ -98,7 +156,8 @@ export default {
         term_of_execution: '',
         contract_number: '',
         priority_code: '',
-        task_type_code: ''
+        task_type_code: '',
+        performer_login: ''
       }
       this.contract =  {
         contract_details: '',
@@ -117,4 +176,15 @@ export default {
   align-items: center;
   margin: 10px;
 }
+.date__input{
+  border: 1px solid black;
+  width: 100%;
+  border-radius: 5px;
+}
+.select__name{
+  display: flex;
+  margin: 5px;
+  width: 100%;
+}
+
 </style>
