@@ -137,7 +137,7 @@ class TasksApiView(APIView):
             id: int = request.data['id']
            # if request.data['performer_number'] 
             update_dictperformer_number = request.data['performer_number']
-
+            update_dict[id] = update_dictperformer_number}
         except Exception:
             return Response({"error": "body was incorrect"})
         
