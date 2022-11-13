@@ -17,7 +17,8 @@ def init_connection(user: str, password: str):
     conn = psycopg2.connect(dbname='demo',
                             user=user,
                             password=password,
-                            host='95.165.30.171',
+                            #host='95.165.30.171',
+                            host='localhost',
                             port='54321'
                             )
 
@@ -137,22 +138,49 @@ class TasksApiView(APIView):
 
         update_dict = {}
         try:
-            id: int = request.data['id']
-           # if request.data['performer_number'] 
-            update_dictperformer_number = request.data['performer_number']
-            update_dict[id] = update_dictperformer_number
+            task_number: int = request.data['task_number']
+
+            if 'performer_number' in request.data.keys():
+                update_dict['performer_number'] =  request.data['performer_number']
+            if 'contract_number' in request.data.keys():
+                update_dict['contact_number'] =  request.data['contact_number']
+            if 'term_of_execution' in request.data.keys():
+                update_dict['term_of_execution'] =  request.data['term_of_execution']
+            if 'status' in request.data.keys():
+                update_dict['status'] =  request.data['status']
+
+            if 'priority_code' in request.data.keys():
+                update_dict['priority_code'] =  request.data['priority_code']
+
+            if 'task_type_code' in request.data.keys():
+                update_dict['task_type_code'] =  request.data['task_type_code']
+ 
         except Exception:
             return Response({"error": "body was incorrect"})
         
-        sql_script = sql.SQL(f"UPDATE task SET ")
+        if 'status' in update_dict.keys():
+            if int(update_dict['status']) > 1:
+                return Response({'errer': "inncoorect status"})
+
+        sql_script = f"UPDATE tasks SET "
         for key, value in update_dict.items():
-            one_update_script = f"{key}='{value}' "
+            one_update_script = f"{key}='{value}', "
             sql_script += one_update_script
-        sql_script += f"WHERE id={id}"
+        
+        sql_script = sql_script[:-2]
+        sql_script += f" WHERE task_number={task_number}"
+        
+        sql_script = sql.SQL(sql_script)
 
-        #return Response(response_data)
-        return Response('HUI')
+        try:  
+            response_data = execute_post_query(query=sql_script,
+                                           login=login,
+                                           password=password
+                                           )
+        except psycopg2.errors.UniqueViolation:
+            return Response({'errer': "you can't edit this task"})
 
+        return Response(response_data)
 
 
 # Api для типов заданий
