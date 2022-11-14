@@ -19,8 +19,8 @@ def init_connection(user: str, password: str):
                             user=user,
                             password=password,
                             #host='95.165.30.171',
-                            host='localhost',
-                            port='54321'
+                            host='postgres',
+                            port='5432'
                             )
 
     cursor = conn.cursor()
@@ -38,7 +38,7 @@ def execute_post_query(query: sql, login: str, password: str):
         cursor.execute(query.as_string(conn))
         cursor.execute("COMMIT")
     except psycopg2.errors.DuplicateObject:
-        return {"error": "task eexists"}
+        return {"error": "task exists"}
     except psycopg2.errors.InsufficientPrivilege:
         return{"error": "permishon_denied"}
 
