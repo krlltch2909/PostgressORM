@@ -1,5 +1,5 @@
 import psycopg2 as pg
-
+import dotenv
 
 def main():
     conn = pg.connect(dbname='demo',

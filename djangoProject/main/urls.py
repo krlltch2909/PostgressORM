@@ -7,5 +7,7 @@ urlpatterns = [
         path('tasks_priority/', views.TaskPriorityApiView.as_view()),
         path('employees/', views.EmlpoyeeApiView.as_view()),
         path('contracts/', views.ContractApiView.as_view()),
-        path('users/', views.UserApiView.as_view())
+        path('users/', views.UserApiView.as_view()),
+        path('contact_numbers/', views.ContactPersonAPIView.as_view()),
+        path('organization/', views.OrganizationAPIView.as_view())
 ]
