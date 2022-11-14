@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView, exception_handler
 from django.utils.datastructures import MultiValueDictKeyError
 import psycopg2
+import os
 
 
 # Create your views here.
@@ -50,8 +51,6 @@ def execute_command(query: str, login: str, password: str) -> list:
     except psycopg2.OperationalError as e:
         return {"error": "incorect login or password"}
 
-        # cursor.execute("SELECT * FROM public.tasks "
-        #                "JOIN public.task_type_classifier USING(task_type_code)")
     cursor.execute(query)
 
     response_data = cursor.fetchall()
@@ -70,6 +69,7 @@ class TasksApiView(APIView):
     permission_classes = [IsAuthenticated, ]
 
     def get(self, request):
+        
         login = self.request.query_params.get('username')
         password = self.request.query_params.get('password')
 
@@ -189,8 +189,8 @@ class TaskTypeApiView(APIView):
 
     def get(self, request):
         
-        login = 'elefant'
-        password = 'kirka2906'
+        login = os.getenv('ADMIN_LOGIN')
+        password = os.getenv('ADMIN_PASSWORD')
         sql_script = "SELECT * FROM public.task_type_classifier"
 
         response_data = execute_command(sql_script, login, password)
@@ -213,8 +213,8 @@ class TaskPriorityApiView(APIView):
     permission_classes = [IsAuthenticated, ]
 
     def get(self, request):
-        login = 'elefant'
-        password = 'kirka2906'
+        login = os.getenv('ADMIN_LOGIN')
+        password = os.getenv('ADMIN_PASSWORD')
         sql_script = "SELECT * FROM public.priority_classifier"
 
         response_data = execute_command(sql_script, login, password)
@@ -293,8 +293,8 @@ class UserApiView(APIView):
 
     def get(self, request):
         login_for_check = self.request.query_params.get('login')
-        login = 'elefant'
-        password = 'kirka2906'
+        login = os.getenv('ADMIN_LOGIN')
+        password = os.getenv('ADMIN_PASSWORD')
         sql_script = f"SELECT login, employee_position FROM public.employees " \
                      f"JOIN position_classifier USING(position_code) WHERE login='{login_for_check}'"
 
@@ -324,7 +324,7 @@ class UserApiView(APIView):
 
 
         try:
-            id_role = execute_command(sql_script, 'elefant', 'kirka2906')[0][0]
+            id_role = execute_command(sql_script, os.getenv('ADMIN_LOGIN'), os.getenv('ADMIN_PASSWORD'))[0][0]
         except:
             return Response({"error": "incorrect role"})
 
@@ -336,3 +336,61 @@ class UserApiView(APIView):
                                            password=password
                                            )
         return Response(response_data)
+
+
+# API для контактный лиц
+class ContactPersonAPIView(APIView):
+    permission_classes = [IsAuthenticated, ]
+
+    def get(self, request):
+        login = os.getenv('ADMIN_LOGIN')
+        password = os.getenv('ADMIN_PASSWORD')
+        sql_script = "SELECT * FROM contact_person"
+
+        response_data = execute_command(sql_script, login, password)
+        if type(response_data) is dict:
+            return Response(response_data)
+
+        ContactPersons: list = []
+        for i in response_data:
+            rez = {
+                'contact_person_number': i[0],
+                'contact_person_name': i[1],
+                'phone': i[2],
+                'email': i[3],
+                'city': i[4],
+                'organization_number': i[5]
+            }
+            ContactPersons.append(rez)
+
+        return Response({'Contact persons': ContactPersons})
+
+
+# API для организаций
+class OrganizationAPIView(APIView):
+    permission_classes = [IsAuthenticated, ]
+
+    def get(self, request):
+        login = os.getenv('ADMIN_LOGIN') 
+        password = os.getenv('ADMIN_PASSWORD')
+        sql_script = "SELECT * FROM organization"
+
+        response_data = execute_command(sql_script, login, password)
+        if type(response_data) is dict:
+            return Response(response_data)
+
+        organizations: list = []
+        for i in response_data:
+            rez = {
+                'organization_number': i[0],
+                'organization_name': i[1],
+                'organization_type': i[2],
+                'email': i[3],
+                'address': i[4],
+                'city': i[5]
+            }
+            organizations.append(rez)
+
+        return Response({'organizations': organizations})
+
+
