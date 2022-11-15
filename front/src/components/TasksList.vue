@@ -37,7 +37,9 @@ export default {
   align-items: center;
 }
 
-.task--list-iten{
+/* Это на будущее что-то?           *
+ * TODO: Проверить что это за фигня */
+.task-list-item{
   display: inline-block;
   margin-right: 10px;
 }

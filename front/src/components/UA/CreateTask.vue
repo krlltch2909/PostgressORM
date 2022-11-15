@@ -9,7 +9,7 @@
     </div>
 
     <div class="select__name">
-      <h8>Term of execution</h8>
+      <b>Term of execution</b>
       <!-- TODO: Исправить Datepicker -->
       <Datepicker
           v-model="task.term_of_execution"
@@ -21,7 +21,7 @@
 
 
     <div class="select__name">
-      <h9>Type codes</h9>
+      <h6>Type codes</h6>
       <my-select
           :options="all_task_type_codes"
           v-model="selectedTypeCode"/>
@@ -29,7 +29,7 @@
 
 
     <div class="select__name">
-      <h9>Priority codes</h9>
+      <h6>Priority codes</h6>
       <my-select
           :options="all_priority_codes"
           v-model="selectedPriorityCode"/>
@@ -37,12 +37,12 @@
 
 
     <div  v-if="role !== 'worker'" class="select__name">
-      <h9>Performer user</h9>
+      <h6>Performer user</h6>
       <my-select :options="all_employees" v-model="performer_login"/>
     </div>
 
     <div class="create__contract">
-      <h8>Create New Contract</h8>
+      <b>Create New Contract</b>
       <input class="form-check-input mt-0"
              v-model="createNewContract" type="checkbox"
              style="margin-left: auto"
