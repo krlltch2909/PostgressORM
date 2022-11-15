@@ -127,8 +127,7 @@ export default {
 
       try {
         if (task.contract_number !== null) {
-          const contract_url = 'http://95.165.30.171:8000/api/contracts/?username=' + this.username + '&password=' + this.password
-
+          const contract_url = process.env.VUE_APP_API + '/contracts/?username=' + this.username + '&password=' + this.password
           let formData = new FormData();
 
           formData.append('contract_details', task.contract_number.contract_details);
@@ -141,7 +140,7 @@ export default {
           task.contract_number = response.data['id'][0][0]
         }
 
-        const url_for_task_add = 'http://95.165.30.171:8000/api/tasks/?username=' + this.username + '&password=' + this.password
+        const url_for_task_add = process.env.VUE_APP_API + '/tasks/?username=' + this.username + '&password=' + this.password
 
         console.log(task)
 
@@ -172,7 +171,7 @@ export default {
     async createUser(user) {
       try {
 
-        const url = 'http://95.165.30.171:8000/api/users/?username=' + this.username + '&password=' + this.password
+        const url = process.env.VUE_APP_API + '/users/?username=' + this.username + '&password=' + this.password
 
         let formData = new FormData();
 
@@ -200,7 +199,7 @@ export default {
     // парсинг самих заданий
     async getTasks(){
       try {
-        const response = await axios.get('http://95.165.30.171:8000/api/tasks/?username=' + this.username + '&password=' + this.password, this.config)
+        const response = await axios.get(process.env.VUE_APP_API + '/tasks/?username=' + this.username + '&password=' + this.password, this.config)
         const array = response.data['tasks']
 
         array.forEach((element)=> {
@@ -264,8 +263,7 @@ export default {
 
       if (this.dbRole === ''){
         try{
-          const roleResponse = await axios.get('http://95.165.30.171:8000/api/users/?login=' + this.username, this.config)
-
+          const roleResponse = await axios.get(process.env.VUE_APP_API + '/users/?login=' + this.username, this.config)
           this.dbRole = roleResponse.data['iAm']['role']
 
         }
@@ -280,7 +278,7 @@ export default {
     async getTasksClassifier(){
       try {
         if (this.tasks_type_classifier.length === 0){
-          const response = await axios.get('http://95.165.30.171:8000/api/tasks_cassifier/', this.config)
+          const response = await axios.get(process.env.VUE_APP_API + '/tasks_cassifier/', this.config)
           const array = response.data['tasks classifier']
           array.forEach((element)=> {
             const newTaskClassifier = {
@@ -293,6 +291,7 @@ export default {
       }
       catch (e){
         console.log('error in tasks classifier loading')
+        console.log(process.env.VUE_APP_API)
       }
     },
 
@@ -300,7 +299,7 @@ export default {
     async getTasksTypeClassifier(){
       try {
           if (this.priority_codes.length === 0){
-            const response = await axios.get('http://95.165.30.171:8000/api/tasks_priority/', this.config)
+            const response = await axios.get(process.env.VUE_APP_API + '/tasks_priority/', this.config)
             const array = response.data['tasks priority']
             array.forEach((element)=> {
               const newPriority = {
@@ -319,7 +318,7 @@ export default {
     // парсинг работников
     async getEmployees(){
       try {
-        const response = await axios.get('http://95.165.30.171:8000/api/employees/?username=' + this.username + '&password=' + this.password, this.config)
+        const response = await axios.get(process.env.VUE_APP_API + '/employees/?username=' + this.username + '&password=' + this.password, this.config)
         const array = response.data['employees']
 
         array.forEach((element)=> {
