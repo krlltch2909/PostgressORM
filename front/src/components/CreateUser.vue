@@ -2,6 +2,7 @@
   <div>
     <form>
       <h3>creation new user</h3>
+      <!-- TODO: Заменить или добавить my-input. Этот тег нигде не определён. КОСЯК! -->
       <my-input
           v-model.trim="user.login"
           placeholder="login"/>
