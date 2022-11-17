@@ -1,6 +1,6 @@
 <template>
   <select style="margin-top: 10px" v-model="modelValue" @input="changeOption" class="form-select" aria-label="Default select example">
-    <option disabled value="">choose from list</option>
+    <option disabled value="">Выбрать из списка</option>
     <option
         v-for="element in options"
         :key="element.id"

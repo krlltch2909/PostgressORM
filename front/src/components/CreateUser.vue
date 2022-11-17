@@ -1,8 +1,7 @@
 <template>
   <div>
     <form>
-      <h3>creation new user</h3>
-      <!-- TODO: Заменить или добавить my-input. Этот тег нигде не определён. КОСЯК! -->
+      <h3>Создание нового пользователя</h3>
       <my-input
           v-model.trim="user.login"
           placeholder="login"/>
@@ -22,9 +21,10 @@
 
 <script>
 import MySelect from "@/components/UA/MySelect";
+import MyInput from "@/components/UA/MyInput";
 export default {
   name: "my-create-user",
-  components: {MySelect},
+  components: {MySelect, MyInput},
   props:{
     selectedRole: String,
     roles: {

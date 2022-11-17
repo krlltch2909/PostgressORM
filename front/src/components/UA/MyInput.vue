@@ -1,11 +1,15 @@
 <template>
-  <input class="input" :value="modelValue" @input="getInput" type="text">
+  <input class="input" :value="modelValue" @input="getInput" :type="type">
 </template>
 
 <script>
 export default {
   name: "my-input",
   props:{
+    type: {
+      type: String,
+      default: 'text'
+    },
     modelValue: [String, Number]
   },
   methods: {

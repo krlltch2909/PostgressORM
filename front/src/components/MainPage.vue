@@ -5,12 +5,12 @@
               v-if="dbRole === 'administrator' "
               style="margin-left: 20px"
               @click="addUserDialog"
-              class="btn btn-warning">Add User</button>
+              class="btn btn-warning">Создать пользователя</button>
 
       <button type="button"
               style="margin-left: 20px"
               @click="changeUser"
-              class="btn btn-warning">Change User</button>
+              class="btn btn-warning">Выйти</button>
     </div>
   </my-nav-bar>
 
@@ -18,14 +18,18 @@
     <div v-if="isLogin === false">
       <div class="input__auth">
         <my-input v-model="username"
-                  placeholder="login.."/>
+                  placeholder="Логин"/>
+        <!--
+        Не совсем понимаю зачем делать отдельный input, если можно использовать обычный со стилем
+        Но ладно, хрен с тобой
+        -->
         <my-input v-model="password"
-                  placeholder="password.."/>
+                  placeholder="Пароль" type="password"/>
       </div>
 
       <div>
         <button type="button" @click="getTasks"
-                class="btn btn-success">Get info</button>
+                class="btn btn-success">Войти</button>
       </div>
     </div>
     <div v-else>
@@ -57,6 +61,7 @@ import MyTasksList from "@/components/TasksList";
 import MyInput from "@/components/UA/MyInput";
 import MyCreateUser from "@/components/CreateUser";
 import MyCreateTask from "@/components/UA/CreateTask";
+import MyNavBar from "@/components/UA/MyNavBar";
 
 
 export default {
@@ -65,7 +70,8 @@ export default {
     MyCreateTask,
     MyCreateUser,
     MyInput,
-    MyTasksList
+    MyTasksList,
+    MyNavBar
   },
 
 
@@ -76,6 +82,7 @@ export default {
 
       isLogin: false,
 
+      // Ну так-то это в бэкенде должно быть
       allDbRoles: [
         {id: 1, value:'worker'},
         {id: 2, value:'manager'},
@@ -91,14 +98,15 @@ export default {
       priority_codes: [],
       config: {
         headers:{
+          // ХАРДКОД (╯°□°）╯︵ ┻━┻
           'Authorization': 'Token e222cdf2fae4ff2e6494640269f150b4ff52f468'
         }
       },
-      // видомость диалогов
+      // видимость диалогов
       add_dialog_visible: false,
       add_task_dialog_visible: false,
 
-      // для выподающих списков
+      // для выпадающих списков
       priorityCodeSort: ''
 
 
@@ -216,20 +224,19 @@ export default {
             term_of_execution: element['term_of_execution']
           }
           if (newTask.contact_number !== null){
-            const contract = {
+            newTask.contact_number = {
               contract_number: element['contract_number'],
               contract_details: element['contract_details'],
               vin: element['vin'],
               license_plate: element['license_plate']
             }
-            newTask.contact_number = contract
           }
 
           if (newTask['status'] === 0){
             newTask['status'] = 'в процессе'
           }
           else {
-            newTask['status'] = 'завершенно'
+            newTask['status'] = 'завершено'
           }
           this.tasks.push(newTask)
 
@@ -238,7 +245,7 @@ export default {
 
       }
       catch (e){
-        alert('error in login or password')
+        alert('Неверный логин или пароль')
       }
 
 
@@ -268,7 +275,7 @@ export default {
 
         }
         catch (e){
-          alert('error in getting role')
+          alert('Ошибка во время присвоения роли')
         }
       }
 
@@ -278,6 +285,7 @@ export default {
     async getTasksClassifier(){
       try {
         if (this.tasks_type_classifier.length === 0){
+          // cassifier??? Кирюх, не болей дислексией, пжлст
           const response = await axios.get(process.env.VUE_APP_API + '/tasks_cassifier/', this.config)
           const array = response.data['tasks classifier']
           array.forEach((element)=> {
@@ -290,7 +298,7 @@ export default {
         }
       }
       catch (e){
-        console.log('error in tasks classifier loading')
+        console.log('Ошибка при загрузке классификаторов')
         console.log(process.env.VUE_APP_API)
       }
     },
@@ -311,7 +319,7 @@ export default {
           }
       }
       catch (e){
-        console.log('error in tasks classifier loading')
+        console.log('Ошибка во время загрузки классификатора приоритетов')
       }
     },
 

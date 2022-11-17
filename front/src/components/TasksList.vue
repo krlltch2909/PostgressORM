@@ -1,10 +1,10 @@
 <template>
   <div>
     <div class="task__worker">
-      <h3> List of tasks</h3>
+      <h3>Список задач</h3>
       <button type="button"
               @click="$emit('create_task')"
-              class="btn btn-warning">Create Task</button>
+              class="btn btn-warning">Создать задачу</button>
     </div>
       <transition-group name="post-list">
         <my-task-item v-for="task in tasks"

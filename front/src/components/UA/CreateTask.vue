@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h3>Create new Task</h3>
+    <h3>Создание задачи</h3>
 
     <div v-if="error !== ''">
       <div class="alert alert-danger" role="alert">
@@ -9,7 +9,7 @@
     </div>
 
     <div class="select__name">
-      <b>Term of execution</b>
+      <b>Дата исполнения</b>
       <!-- TODO: Исправить Datepicker -->
       <Datepicker
           v-model="task.term_of_execution"
@@ -21,7 +21,7 @@
 
 
     <div class="select__name">
-      <h6>Type codes</h6>
+      <h6>Тип задачи</h6>
       <my-select
           :options="all_task_type_codes"
           v-model="selectedTypeCode"/>
@@ -29,7 +29,7 @@
 
 
     <div class="select__name">
-      <h6>Priority codes</h6>
+      <h6>Приоритет</h6>
       <my-select
           :options="all_priority_codes"
           v-model="selectedPriorityCode"/>
@@ -37,12 +37,12 @@
 
 
     <div  v-if="role !== 'worker'" class="select__name">
-      <h6>Performer user</h6>
+      <h6>Исполнитель</h6>
       <my-select :options="all_employees" v-model="performer_login"/>
     </div>
 
     <div class="create__contract">
-      <b>Create New Contract</b>
+      <b>Внести новый контракт</b>
       <input class="form-check-input mt-0"
              v-model="createNewContract" type="checkbox"
              style="margin-left: auto"
@@ -62,7 +62,7 @@
     </div>
 
 
-    <button type="button" @click="createNewTask" class="btn btn-success">create</button>
+    <button type="button" @click="createNewTask" class="btn btn-success">Создать</button>
   </div>
 </template>
 
@@ -116,7 +116,7 @@ export default {
     createNewTask(){
 
       if (this.task.term_of_execution === ''){
-        this.error= "date must be chosen"
+        this.error= "Необходимо указать дату исполнения"
         return
       }
       else {
@@ -124,18 +124,18 @@ export default {
       }
 
       if (this.selectedPriorityCode === ''){
-        this.error= "task priority must be chosen"
+        this.error= "Необходимо указать приоритет"
         return
       }
 
       if (this.selectedTypeCode === ''){
-        alert("task type code must be chosen")
+        alert("Необходимо указать тип задачи")
         return
       }
 
       if (this.createNewContract === true){
         if (this.contract.vin.length > 9){
-          alert("vin must be no more then 9")
+          alert("VIN не может быть длиннее 9 символов")
           return
         }
       }

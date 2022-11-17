@@ -1,6 +1,7 @@
 <template>
   <div class="task">
     <div>
+    <!-- TODO: Попробовать перевести эту хрень. Но тут всё придётся менять -->
       <div v-for="(values, key_task) in task" :key="key_task">
         <div v-if="key_task !== 'contact_number'">
           <strong>{{key_task}}: </strong>{{values}}
@@ -17,7 +18,7 @@
     <div class="task__button">
       <button type="button" class="btn btn-danger"
               @click="$emit('show_task_changer', task)"
-      >Edit</button>
+      >Редактировать</button>
     </div>
 
   </div>
