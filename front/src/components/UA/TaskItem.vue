@@ -43,13 +43,13 @@ export default {
 <style scoped>
 .task {
   padding: 20px;
-  border: 2px solid teal;
+  border: 2px solid #00abc3;
+  border-radius: 10px;
   margin: 15px;
   display: flex;
   align-items: center;
 }
 .task__button{
-  padding: 20px;
   margin-left: auto;
 }
 .v_else{

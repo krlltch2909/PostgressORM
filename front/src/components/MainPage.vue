@@ -358,11 +358,19 @@ export default {
 
 <style>
 .input__auth{
-  margin: 5px;
+  margin-left: 5px;
 }
 .btn {
+  margin-top: 10px;
   margin-left: auto;
   display: flex;
+  background-color: #00abc3;
+  border-color: #00abc3;
+  color: #fff;
+}
+.btn:hover {
+  background-color: #00a896;
+  border-color: #00a896;
 }
 .btn__input{
   display: flex;
