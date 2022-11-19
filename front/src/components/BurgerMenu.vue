@@ -14,6 +14,7 @@
 <script>
 import { Slide } from "vue3-burger-menu";
 export default {
+  name: "burger-menu",
   components: {
     Slide,
   },

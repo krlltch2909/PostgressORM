@@ -1,6 +1,6 @@
 <template>
   <div class="navBar">
-    <BurgerMenu/>
+    <burger-menu/>
     <div class="app__name"><strong>BELAZZZ NOTEBOOK</strong></div>
     <div class="naveBar__buttons">
       <slot>
@@ -14,7 +14,7 @@ import BurgerMenu from "@/components/BurgerMenu";
 export default {
   name: "navbar",
   components: {
-    BurgerMenu,
+    "burger-menu": BurgerMenu
   },
 }
 </script>

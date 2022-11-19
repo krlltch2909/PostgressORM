@@ -1,6 +1,6 @@
 <!--suppress ALL -->
 <template>
-  <main-page/>
+  <router-view/>
 </template>
 
 <script>
