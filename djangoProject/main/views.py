@@ -1,12 +1,13 @@
 import datetime
 from typing import Optional
-from django.http import request
+
 from psycopg2 import sql
-from rest_framework import response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.views import APIView, exception_handler
+from rest_framework.views import APIView
 from django.utils.datastructures import MultiValueDictKeyError
+from djangoProject.settings import ADMIN_PASSWORD, ADMIN_LOGIN
+from django.contrib.sessions.backends.db import SessionStore
 import psycopg2
 import os
 
@@ -18,9 +19,9 @@ def init_connection(user: str, password: str):
     conn = psycopg2.connect(dbname='demo',
                             user=user,
                             password=password,
-                            #host='95.165.30.171',
-                            host='postgres',
-                            port='5432'
+                            # host='95.165.30.171',
+                            host='localhost',
+                            port='54321'
                             )
 
     cursor = conn.cursor()
@@ -40,7 +41,7 @@ def execute_post_query(query: sql, login: str, password: str):
     except psycopg2.errors.DuplicateObject:
         return {"error": "task exists"}
     except psycopg2.errors.InsufficientPrivilege:
-        return{"error": "permishon_denied"}
+        return {"error": "permishon_denied"}
 
     return {"status": 200}
 
@@ -64,14 +65,61 @@ def close_conn(conn, cursor):
     conn.close()
 
 
+# класс для авторизации и получения токена
+class AuthAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+
+        try:
+            login: str = request.data['login']
+            password: str = request.data['password']
+        except MultiValueDictKeyError as e:
+            return Response({"error": "body was incorrect"})
+
+        try:
+            conn, cursor = init_connection(user=login, password=password)
+        except psycopg2.OperationalError as e:
+            return {"error": "incorect login or password"}
+
+        close_conn(conn, cursor)
+
+        s = SessionStore()
+        s['login'] = login
+        s['password'] = password
+
+        # s.set_expiry(60)
+
+        s.create()
+
+        return Response({"session token": s.session_key})
+
+    def delete(self, request):
+
+        try:
+            session = self.request.query_params.get('session')
+            s = SessionStore(session_key=session)
+        except Exception:
+            return Response({"error": "incorrect token"})
+
+        s.flush()
+
+        return Response()
+
+
 # Api для заданий
 class TasksApiView(APIView):
     permission_classes = [IsAuthenticated, ]
 
     def get(self, request):
-        
-        login = self.request.query_params.get('username')
-        password = self.request.query_params.get('password')
+        try:
+            session = self.request.query_params.get('session')
+            s = SessionStore(session_key=session)
+            login = s['login']
+            password = s['password']
+
+        except Exception:
+            return Response({"error": "incorrect token"})
 
         sql_script = "SELECT * FROM public.tasks LEFT JOIN public.contract USING(contract_number)"
 
@@ -79,7 +127,7 @@ class TasksApiView(APIView):
         if type(response_data) is dict:
             return Response(response_data)
 
-        tasksList: list = []
+        tasks_list: list = []
         for i in response_data:
             rez = {
                 'task_number': i[1],
@@ -96,13 +144,19 @@ class TasksApiView(APIView):
                 'vin': i[11],
                 'license_plate': i[12]
             }
-            tasksList.append(rez)
+            tasks_list.append(rez)
 
-        return Response({'tasks': tasksList})
+        return Response({'tasks': tasks_list})
 
     def post(self, request):
-        login = self.request.query_params.get('username')
-        password = self.request.query_params.get('password')
+        try:
+            session = self.request.query_params.get('session')
+            s = SessionStore(session_key=session)
+            login = s['login']
+            password = s['password']
+
+        except Exception:
+            return Response({"error": "incorrect token"})
 
         try:
             term_of_execution = request.data['term_of_execution']
@@ -110,7 +164,7 @@ class TasksApiView(APIView):
             priority_code: int = request.data['priority_code']
             task_type_code: int = request.data['task_type_code']
             performer_number = request.data['performer_number']
-        except Exception:
+        except MultiValueDictKeyError:
             return Response({"error": "body was incorrect"})
 
         # Переводим дату в нужный формат из строки
@@ -120,11 +174,10 @@ class TasksApiView(APIView):
 
         if performer_number == '':
             sql_script = sql.SQL(
-            f"INSERT INTO tasks(term_of_execution, contract_number, author_number, priority_code, task_type_code) VALUES ('{term_of_execution}', {contract_number}, 1 , {priority_code}, {task_type_code})")
-        else: 
-             sql_script = sql.SQL(
-            f"INSERT INTO tasks(term_of_execution, contract_number, author_number, performer_number, priority_code, task_type_code) VALUES ('{term_of_execution}', {contract_number}, 1 ,{performer_number}, {priority_code}, {task_type_code})")
-
+                f"INSERT INTO tasks(term_of_execution, contract_number, author_number, priority_code, task_type_code) VALUES ('{term_of_execution}', {contract_number}, 1 , {priority_code}, {task_type_code})")
+        else:
+            sql_script = sql.SQL(
+                f"INSERT INTO tasks(term_of_execution, contract_number, author_number, performer_number, priority_code, task_type_code) VALUES ('{term_of_execution}', {contract_number}, 1 ,{performer_number}, {priority_code}, {task_type_code})")
 
         response_data = execute_post_query(query=sql_script,
                                            login=login,
@@ -133,31 +186,37 @@ class TasksApiView(APIView):
         return Response(response_data)
 
     def put(self, request):
-        login = self.request.query_params.get('username')
-        password = self.request.query_params.get('password')
+        try:
+            session = self.request.query_params.get('session')
+            s = SessionStore(session_key=session)
+            login = s['login']
+            password = s['password']
+
+        except Exception:
+            return Response({"error": "incorrect token"})
 
         update_dict = {}
         try:
             task_number: int = request.data['task_number']
 
             if 'performer_number' in request.data.keys():
-                update_dict['performer_number'] =  request.data['performer_number']
+                update_dict['performer_number'] = request.data['performer_number']
             if 'contract_number' in request.data.keys():
-                update_dict['contact_number'] =  request.data['contact_number']
+                update_dict['contact_number'] = request.data['contact_number']
             if 'term_of_execution' in request.data.keys():
-                update_dict['term_of_execution'] =  request.data['term_of_execution']
+                update_dict['term_of_execution'] = request.data['term_of_execution']
             if 'status' in request.data.keys():
-                update_dict['status'] =  request.data['status']
+                update_dict['status'] = request.data['status']
 
             if 'priority_code' in request.data.keys():
-                update_dict['priority_code'] =  request.data['priority_code']
+                update_dict['priority_code'] = request.data['priority_code']
 
             if 'task_type_code' in request.data.keys():
-                update_dict['task_type_code'] =  request.data['task_type_code']
- 
-        except Exception:
+                update_dict['task_type_code'] = request.data['task_type_code']
+
+        except MultiValueDictKeyError:
             return Response({"error": "body was incorrect"})
-        
+
         if 'status' in update_dict.keys():
             if int(update_dict['status']) > 1:
                 return Response({'errer': "inncoorect status"})
@@ -166,17 +225,17 @@ class TasksApiView(APIView):
         for key, value in update_dict.items():
             one_update_script = f"{key}='{value}', "
             sql_script += one_update_script
-        
+
         sql_script = sql_script[:-2]
         sql_script += f" WHERE task_number={task_number}"
-        
+
         sql_script = sql.SQL(sql_script)
 
-        try:  
+        try:
             response_data = execute_post_query(query=sql_script,
-                                           login=login,
-                                           password=password
-                                           )
+                                               login=login,
+                                               password=password
+                                               )
         except psycopg2.errors.UniqueViolation:
             return Response({'errer': "you can't edit this task"})
 
@@ -188,24 +247,31 @@ class TaskTypeApiView(APIView):
     permission_classes = [IsAuthenticated, ]
 
     def get(self, request):
-        
-        login = os.getenv('ADMIN_LOGIN')
-        password = os.getenv('ADMIN_PASSWORD')
+
+        try:
+            session = self.request.query_params.get('session')
+            s = SessionStore(session_key=session)
+            login = s['login']
+            password = s['password']
+
+        except Exception:
+            return Response({"error": "incorrect token"})
+
         sql_script = "SELECT * FROM public.task_type_classifier"
 
         response_data = execute_command(sql_script, login, password)
         if type(response_data) is dict:
             return Response(response_data)
 
-        tasksClasses: list = []
+        tasks_classes: list = []
         for i in response_data:
             rez = {
                 'task_type_code': i[0],
                 'task_type': i[1]
             }
-            tasksClasses.append(rez)
+            tasks_classes.append(rez)
 
-        return Response({'tasks classifier': tasksClasses})
+        return Response({'tasks classifier': tasks_classes})
 
 
 # Api для приоритетов заданий
@@ -213,23 +279,29 @@ class TaskPriorityApiView(APIView):
     permission_classes = [IsAuthenticated, ]
 
     def get(self, request):
-        login = os.getenv('ADMIN_LOGIN')
-        password = os.getenv('ADMIN_PASSWORD')
+        try:
+            session = self.request.query_params.get('session')
+            s = SessionStore(session_key=session)
+            login = s['login']
+            password = s['password']
+
+        except Exception:
+            return Response({"error": "incorrect token"})
         sql_script = "SELECT * FROM public.priority_classifier"
 
         response_data = execute_command(sql_script, login, password)
         if type(response_data) is dict:
             return Response(response_data)
 
-        tasksTypeClasses: list = []
+        tasks_type_classes: list = []
         for i in response_data:
             rez = {
                 'priority_code': i[0],
                 'classifier': i[1]
             }
-            tasksTypeClasses.append(rez)
+            tasks_type_classes.append(rez)
 
-        return Response({'tasks priority': tasksTypeClasses})
+        return Response({'tasks priority': tasks_type_classes})
 
 
 # Api для работников
@@ -238,23 +310,29 @@ class EmlpoyeeApiView(APIView):
 
     def get(self, request):
 
-        login = self.request.query_params.get('username')
-        password = self.request.query_params.get('password')
+        try:
+            session = self.request.query_params.get('session')
+            s = SessionStore(session_key=session)
+            login = s['login']
+            password = s['password']
+
+        except Exception:
+            return Response({"error": "incorrect token"})
 
         sql_script = "SELECT employee_id, login FROM public.employees "
         response_data = execute_command(sql_script, login, password)
         if type(response_data) is dict:
             return Response(response_data)
 
-        employeeList: list = []
+        employee_list: list = []
         for i in response_data:
             rez = {
                 'employee_id': i[0],
                 'login': i[1]
             }
-            employeeList.append(rez)
+            employee_list.append(rez)
 
-        return Response({'employees': employeeList})
+        return Response({'employees': employee_list})
 
 
 # Api для контрактов
@@ -262,25 +340,26 @@ class ContractApiView(APIView):
     permission_classes = [IsAuthenticated, ]
 
     def post(self, request):
-        login = self.request.query_params.get('username')
-        password = self.request.query_params.get('password')
+        try:
+            session = self.request.query_params.get('session')
+            s = SessionStore(session_key=session)
+            login = s['login']
+            password = s['password']
 
+        except Exception:
+            return Response({"error": "incorrect token"})
         try:
             contract_details: Optional[str] = request.data['contract_details']
             vin = request.data['vin']
             license_plate = request.data['license_plate']
-        except Exception:
+        except MultiValueDictKeyError:
             return Response({"error": "body was incorrect"})
-
-        print(contract_details, vin, license_plate)
 
         sql_script = sql.SQL(
             f"INSERT INTO contract(contract_details, vin, license_plate, contact_person_number) VALUES ('{contract_details}', '{vin}', '{license_plate}', null)")
 
-        response_contract = execute_post_query(query=sql_script,
-                                               login=login,
-                                               password=password
-                                               )
+        execute_post_query(query=sql_script, login=login, password=password)
+
         sql_script = f"SELECT contract_number FROM contract WHERE contract_details='{contract_details}' AND vin='{vin}' AND license_plate='{license_plate}' ORDER BY contract_number DESC LIMIT 1"
         response_contract = execute_command(query=sql_script, login=login, password=password)
 
@@ -292,9 +371,16 @@ class UserApiView(APIView):
     permission_classes = [IsAuthenticated, ]
 
     def get(self, request):
-        login_for_check = self.request.query_params.get('login')
-        login = os.getenv('ADMIN_LOGIN')
-        password = os.getenv('ADMIN_PASSWORD')
+
+        try:
+            session = self.request.query_params.get('session')
+            s = SessionStore(session_key=session)
+            login = s['login']
+            password = s['password']
+            login_for_check = s['login']
+        except Exception:
+            return Response({"error": "incorrect token"})
+
         sql_script = f"SELECT login, employee_position FROM public.employees " \
                      f"JOIN position_classifier USING(position_code) WHERE login='{login_for_check}'"
 
@@ -308,24 +394,29 @@ class UserApiView(APIView):
         return Response({"iAm": rez})
 
     def post(self, request):
-        login = self.request.query_params.get('username')
-        password = self.request.query_params.get('password')
+
+        try:
+            session = self.request.query_params.get('session')
+            s = SessionStore(session_key=session)
+            login = s['login']
+            password = s['password']
+        except Exception:
+            return Response({"error": "incorrect token"})
 
         try:
             login_for_user: str = request.data['login']
             password_for_user: str = request.data['password']
             name_for_user: str = request.data['name']
             role_for_user: str = request.data['role']
-        except Exception:
+        except MultiValueDictKeyError:
             return Response({"error": "body was incorrect"})
 
         sql_script = f"SELECT position_code FROM position_classifier WHERE " \
                      f" employee_position='{role_for_user}';"
 
-
         try:
             id_role = execute_command(sql_script, os.getenv('ADMIN_LOGIN'), os.getenv('ADMIN_PASSWORD'))[0][0]
-        except:
+        except Exception:
             return Response({"error": "incorrect role"})
 
         sql_script = sql.SQL(
@@ -343,15 +434,21 @@ class ContactPersonAPIView(APIView):
     permission_classes = [IsAuthenticated, ]
 
     def get(self, request):
-        login = os.getenv('ADMIN_LOGIN')
-        password = os.getenv('ADMIN_PASSWORD')
+        try:
+            session = self.request.query_params.get('session')
+            SessionStore(session_key=session)
+        except Exception:
+            return Response({"error": "incorrect token"})
+
+        login = ADMIN_LOGIN
+        password = ADMIN_PASSWORD
         sql_script = "SELECT * FROM contact_person"
 
         response_data = execute_command(sql_script, login, password)
         if type(response_data) is dict:
             return Response(response_data)
 
-        ContactPersons: list = []
+        contact_persons: list = []
         for i in response_data:
             rez = {
                 'contact_person_number': i[0],
@@ -361,9 +458,9 @@ class ContactPersonAPIView(APIView):
                 'city': i[4],
                 'organization_number': i[5]
             }
-            ContactPersons.append(rez)
+            contact_persons.append(rez)
 
-        return Response({'Contact persons': ContactPersons})
+        return Response({'Contact persons': contact_persons})
 
 
 # API для организаций
@@ -371,8 +468,14 @@ class OrganizationAPIView(APIView):
     permission_classes = [IsAuthenticated, ]
 
     def get(self, request):
-        login = os.getenv('ADMIN_LOGIN') 
-        password = os.getenv('ADMIN_PASSWORD')
+        try:
+            session = self.request.query_params.get('session')
+            SessionStore(session_key=session)
+        except Exception:
+            return Response({"error": "incorrect token"})
+
+        login = ADMIN_LOGIN
+        password = ADMIN_PASSWORD
         sql_script = "SELECT * FROM organization"
 
         response_data = execute_command(sql_script, login, password)
@@ -392,5 +495,3 @@ class OrganizationAPIView(APIView):
             organizations.append(rez)
 
         return Response({'organizations': organizations})
-
-
