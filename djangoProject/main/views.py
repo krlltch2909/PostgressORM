@@ -68,7 +68,7 @@ def close_conn(conn, cursor):
 
 # класс для авторизации и получения токена
 class AuthAPIView(APIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
 
