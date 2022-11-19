@@ -20,8 +20,8 @@ def init_connection(user: str, password: str):
                             user=user,
                             password=password,
                             # host='95.165.30.171',
-                            host='localhost',
-                            port='54321'
+                            host='postgres',
+                            port='5432'
                             )
 
     cursor = conn.cursor()
@@ -92,7 +92,11 @@ class AuthAPIView(APIView):
 
         s.create()
 
-        return Response({"session token": s.session_key})
+        response = Response()
+        response.set_cookie('cookie', f'Session {s.session_key}')
+
+        return response
+        # return Response({"session token": s.session_key})
 
     def delete(self, request):
 
@@ -113,8 +117,9 @@ class TasksApiView(APIView):
 
     def get(self, request):
         try:
-            session = self.request.query_params.get('session')
-            s = SessionStore(session_key=session)
+            raw_session: str = self.request.headers['Cookie']
+            session = raw_session.split(' ')
+            s = SessionStore(session_key=session[1])
             login = s['login']
             password = s['password']
 
@@ -150,8 +155,9 @@ class TasksApiView(APIView):
 
     def post(self, request):
         try:
-            session = self.request.query_params.get('session')
-            s = SessionStore(session_key=session)
+            raw_session: str = self.request.headers['Cookie']
+            session = raw_session.split(' ')
+            s = SessionStore(session_key=session[1])
             login = s['login']
             password = s['password']
 
@@ -187,8 +193,9 @@ class TasksApiView(APIView):
 
     def put(self, request):
         try:
-            session = self.request.query_params.get('session')
-            s = SessionStore(session_key=session)
+            raw_session: str = self.request.headers['Cookie']
+            session = raw_session.split(' ')
+            s = SessionStore(session_key=session[1])
             login = s['login']
             password = s['password']
 
@@ -249,8 +256,9 @@ class TaskTypeApiView(APIView):
     def get(self, request):
 
         try:
-            session = self.request.query_params.get('session')
-            s = SessionStore(session_key=session)
+            raw_session: str = self.request.headers['Cookie']
+            session = raw_session.split(' ')
+            s = SessionStore(session_key=session[1])
             login = s['login']
             password = s['password']
 
@@ -280,8 +288,9 @@ class TaskPriorityApiView(APIView):
 
     def get(self, request):
         try:
-            session = self.request.query_params.get('session')
-            s = SessionStore(session_key=session)
+            raw_session: str = self.request.headers['Cookie']
+            session = raw_session.split(' ')
+            s = SessionStore(session_key=session[1])
             login = s['login']
             password = s['password']
 
@@ -311,8 +320,9 @@ class EmlpoyeeApiView(APIView):
     def get(self, request):
 
         try:
-            session = self.request.query_params.get('session')
-            s = SessionStore(session_key=session)
+            raw_session: str = self.request.headers['Cookie']
+            session = raw_session.split(' ')
+            s = SessionStore(session_key=session[1])
             login = s['login']
             password = s['password']
 
@@ -341,8 +351,9 @@ class ContractApiView(APIView):
 
     def post(self, request):
         try:
-            session = self.request.query_params.get('session')
-            s = SessionStore(session_key=session)
+            raw_session: str = self.request.headers['Cookie']
+            session = raw_session.split(' ')
+            s = SessionStore(session_key=session[1])
             login = s['login']
             password = s['password']
 
@@ -373,8 +384,9 @@ class UserApiView(APIView):
     def get(self, request):
 
         try:
-            session = self.request.query_params.get('session')
-            s = SessionStore(session_key=session)
+            raw_session: str = self.request.headers['Cookie']
+            session = raw_session.split(' ')
+            s = SessionStore(session_key=session[1])
             login = s['login']
             password = s['password']
             login_for_check = s['login']
@@ -396,8 +408,9 @@ class UserApiView(APIView):
     def post(self, request):
 
         try:
-            session = self.request.query_params.get('session')
-            s = SessionStore(session_key=session)
+            raw_session: str = self.request.headers['Cookie']
+            session = raw_session.split(' ')
+            s = SessionStore(session_key=session[1])
             login = s['login']
             password = s['password']
         except Exception:
@@ -435,8 +448,9 @@ class ContactPersonAPIView(APIView):
 
     def get(self, request):
         try:
-            session = self.request.query_params.get('session')
-            SessionStore(session_key=session)
+            raw_session: str = self.request.headers['Cookie']
+            session = raw_session.split(' ')
+            SessionStore(session_key=session[1])
         except Exception:
             return Response({"error": "incorrect token"})
 
@@ -469,8 +483,9 @@ class OrganizationAPIView(APIView):
 
     def get(self, request):
         try:
-            session = self.request.query_params.get('session')
-            SessionStore(session_key=session)
+            raw_session: str = self.request.headers['Cookie']
+            session = raw_session.split(' ')
+            SessionStore(session_key=session[1])
         except Exception:
             return Response({"error": "incorrect token"})
 
