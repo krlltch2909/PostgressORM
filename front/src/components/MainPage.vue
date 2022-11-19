@@ -286,7 +286,10 @@ export default {
       try {
         if (this.tasks_type_classifier.length === 0){
           // cassifier??? Кирюх, не болей дислексией, пжлст
-          const response = await axios.get(process.env.VUE_APP_API + '/tasks_cassifier/', this.config)
+          let response = await axios.get(process.env.VUE_APP_API + '/tasks_cassifier/', this.config)
+          if(response.status !== 200) {
+            response = await axios.get(process.env.VUE_APP_API + '/tasks_classifier/', this.config)
+          }
           const array = response.data['tasks classifier']
           array.forEach((element)=> {
             const newTaskClassifier = {
@@ -361,7 +364,6 @@ export default {
   margin-left: 5px;
 }
 .btn {
-  margin-top: 10px;
   margin-left: auto;
   display: flex;
   background-color: #00abc3;
