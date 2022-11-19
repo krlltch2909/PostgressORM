@@ -22,7 +22,7 @@
 
     <div class="select__name">
       <h6>Тип задачи</h6>
-      <my-select
+      <base-select
           :options="all_task_type_codes"
           v-model="selectedTypeCode"/>
     </div>
@@ -30,7 +30,7 @@
 
     <div class="select__name">
       <h6>Приоритет</h6>
-      <my-select
+      <base-select
           :options="all_priority_codes"
           v-model="selectedPriorityCode"/>
     </div>
@@ -38,7 +38,7 @@
 
     <div  v-if="role !== 'worker'" class="select__name">
       <h6>Исполнитель</h6>
-      <my-select :options="all_employees" v-model="performer_login"/>
+      <base-select :options="all_employees" v-model="performer_login"/>
     </div>
 
     <div class="create__contract">
@@ -50,13 +50,13 @@
     </div>
 
     <div class="contract" v-if="createNewContract === true">
-      <my-input
+      <base-input
           v-model.trim="contract.contract_details"
           placeholder="contract details"/>
-      <my-input
+      <base-input
           v-model.trim="contract.vin"
           placeholder="vin"/>
-      <my-input
+      <base-input
           v-model.trim="contract.license_plate"
           placeholder="license plate"/>
     </div>
@@ -67,11 +67,12 @@
 </template>
 
 <script>
-import MySelect from "@/components/UA/MySelect";
+import BaseSelect from "@/components/BaseSelect";
 import Datepicker from '@vuepic/vue-datepicker';
+
 export default {
-  name: "my-create-task",
-  components: {MySelect, Datepicker},
+  name: "task-create-popup",
+  components: {BaseSelect, Datepicker},
   props:{
     all_task_type_codes:{
       type: Array

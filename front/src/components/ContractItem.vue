@@ -11,7 +11,7 @@
 
 <script>
 export default {
-  name: "my-contract-item",
+  name: "contract-item",
   props:{
     contract: {
       require: true

@@ -1,19 +1,20 @@
-# front
+# Kotiweb
+Kotiweb - это веб-оболочка для Kotisivut (временное название), созданная в рамках практических работ по курсу "Программные средства манипулирования данными".
 
-## Project setup
+## Установка
+### Предварительные требования
+Для работы с Kotiweb необходимо установить [Node.js](https://nodejs.org/en/). Далее необходимо установить зависимости, выполнив команду `npm install` в корневой директории проекта.
 ```
 npm install
 ```
 
-### Compiles and hot-reloads for development
+### Запуск
+Версия для разработки:
 ```
 npm run serve
 ```
 
-### Compiles and minifies for production
+Версия для продакшена:
 ```
 npm run build
 ```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).

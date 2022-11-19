@@ -7,7 +7,7 @@
               class="btn btn-warning">Создать задачу</button>
     </div>
       <transition-group name="post-list">
-        <my-task-item v-for="task in tasks"
+        <task-item v-for="task in tasks"
                    :task="task"
                    :key="task.id"
                       @show_task_changer="$emit('show_task_changer', task)"
@@ -17,10 +17,10 @@
 </template>
 
 <script>
-import MyTaskItem from "@/components/UA/TaskItem";
+import TaskItem from "@/components/TaskItem";
 export default {
-  name: "my-tasks-list",
-  components: {MyTaskItem},
+  name: "task-list",
+  components: {TaskItem},
   props:{
     tasks:{
       type: Array,

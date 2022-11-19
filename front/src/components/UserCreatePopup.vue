@@ -2,17 +2,17 @@
   <div>
     <form>
       <h3>Создание нового пользователя</h3>
-      <my-input
+      <base-input
           v-model.trim="user.login"
           placeholder="login"/>
-      <my-input
+      <base-input
           v-model.trim="user.password"
           placeholder="password"/>
-      <my-input
+      <base-input
           v-model.trim="user.user_name"
           placeholder="name"/>
 
-      <my-select :options="roles" v-model="selectedRole"/>
+      <base-select :options="roles" v-model="selectedRole"/>
 
       <button type="button" @click="createNewPost" class="btn btn-success">create</button>
     </form>
@@ -20,11 +20,11 @@
 </template>
 
 <script>
-import MySelect from "@/components/UA/MySelect";
-import MyInput from "@/components/UA/MyInput";
+import BaseInput from "@/components/BaseInput";
+import BaseSelect from "@/components/BaseSelect";
 export default {
-  name: "my-create-user",
-  components: {MySelect, MyInput},
+  name: "user-create-popup",
+  components: {BaseSelect, BaseInput},
   props:{
     selectedRole: String,
     roles: {

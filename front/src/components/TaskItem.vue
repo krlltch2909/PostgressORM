@@ -9,7 +9,7 @@
 
         <div v-else-if="values !== null" class="v_else">
           <strong>{{key_task}}:</strong>
-          <my-contract-item :contract="values"/>
+          <contract-item :contract="values"/>
         </div>
 
       </div>
@@ -27,10 +27,10 @@
 
 <script>
 
-import MyContractItem from "@/components/UA/ContractItem";
+import ContractItem from "@/components/ContractItem";
 export default {
-  name: 'my-task-item',
-  components: {MyContractItem},
+  name: 'task-item',
+  components: {ContractItem},
   props: {
     task: {
       type: Object,

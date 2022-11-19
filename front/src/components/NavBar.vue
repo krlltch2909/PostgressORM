@@ -10,9 +10,9 @@
 </template>
 
 <script>
-import BurgerMenu from "@/components/UA/BurgerMenu";
+import BurgerMenu from "@/components/BurgerMenu";
 export default {
-  name: "my-nav-bar",
+  name: "navbar",
   components: {
     BurgerMenu,
   },
@@ -28,6 +28,7 @@ export default {
   align-items: center;
   padding: 20px;
 }
+/* ??????? */
 .naveBar__buttons{
   margin-left: auto;
 }

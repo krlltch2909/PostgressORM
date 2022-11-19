@@ -14,7 +14,7 @@
 
 <script>
 export default {
-  name: "my-select",
+  name: "base-select",
   props:{
     modelValue: String,
     options: {
