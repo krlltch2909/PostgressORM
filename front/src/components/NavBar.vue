@@ -1,12 +1,12 @@
 <template>
-  <div class="navBar">
-    <burger-menu/>
+  <header id="navBar">
+    <burger-menu v-if="{login} === true"/>
     <div class="app__name"><strong>BELAZZZ NOTEBOOK</strong></div>
     <div class="naveBar__buttons">
       <slot>
       </slot>
     </div>
-  </div>
+  </header>
 </template>
 
 <script>
@@ -16,11 +16,17 @@ export default {
   components: {
     "burger-menu": BurgerMenu
   },
+  props: {
+    login: {
+      type: Boolean,
+      default: false
+    }
+  }
 }
 </script>
 
 <style scoped>
-.navBar{
+header {
   height: 50px;
   background-color: #05668d;
   box-shadow: 2px 2px 4px gray;

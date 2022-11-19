@@ -5,12 +5,12 @@ import LoginPage from "@/views/LoginPage";
 
 const routes = [
   {
-    path: "/login",
+    path: "/",
     name: "login",
     component: LoginPage
   },
   {
-    path: "/",
+    path: "/tasks",
     name: "tasks",
     component: MainPage
   },

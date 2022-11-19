@@ -1,5 +1,21 @@
 <template>
-  <navbar>
+  <navbar :login="login">
+    <task-list :tasks="tasks"
+               @create_task="createTaskDialog"
+    />
+
+    <base-dialog v-model:show="add_dialog_visible">
+      <user-create-popup :roles="allDbRoles" @createUser="createUser"/>
+    </base-dialog>
+
+    <base-dialog v-model:show="add_task_dialog_visible">
+      <task-create-popup :all_priority_codes="priority_codes"
+                         :all_task_type_codes="tasks_type_classifier"
+                         :all_employees="employees"
+                         :role="dbRole"
+                         @createTask="createTask"
+      />
+    </base-dialog>
     <div  v-if="tasks.length !== 0" class="btn__input">
       <button type="button"
               v-if="dbRole === 'administrator' "
@@ -13,45 +29,6 @@
               class="btn btn-warning">Выйти</button>
     </div>
   </navbar>
-
-  <div class="app">
-    <div v-if="isLogin === false">
-      <div class="input__auth">
-        <base-input v-model="username"
-                  placeholder="Логин"/>
-        <!--
-        Не совсем понимаю зачем делать отдельный input, если можно использовать обычный со стилем
-        Но ладно, хрен с тобой
-        -->
-        <base-input v-model="password"
-                  placeholder="Пароль" type="password"/>
-      </div>
-
-      <div>
-        <button type="button" @click="getTasks"
-                class="btn btn-success">Войти</button>
-      </div>
-    </div>
-    <div v-else>
-      <task-list :tasks="tasks"
-                     @create_task="createTaskDialog"
-      />
-
-      <base-dialog v-model:show="add_dialog_visible">
-        <user-create-popup :roles="allDbRoles" @createUser="createUser"/>
-      </base-dialog>
-
-      <base-dialog v-model:show="add_task_dialog_visible">
-        <task-create-popup :all_priority_codes="priority_codes"
-                        :all_task_type_codes="tasks_type_classifier"
-                        :all_employees="employees"
-                        :role="dbRole"
-                        @createTask="createTask"
-        />
-      </base-dialog>
-
-    </div>
-  </div>
 </template>
 
 <script>
@@ -80,7 +57,6 @@ export default {
       username: 'nick',
       password: 'qwerty',
 
-      isLogin: false,
 
       // Ну так-то это в бэкенде должно быть
       allDbRoles: [
@@ -113,13 +89,14 @@ export default {
     }
   },
 
+
   methods:{
     changeUser(){
       this.username = ''
       this.password = ''
       this.dbRole = ''
       this.tasks = []
-      this.isLogin = false
+      this.login = false
     },
 
     addUserDialog(){
@@ -241,7 +218,7 @@ export default {
           this.tasks.push(newTask)
 
         })
-        this.isLogin = true
+        this.login = true
 
       }
       catch (e){
@@ -355,14 +332,16 @@ export default {
     },
 
   },
-
+  props: {
+    login: {
+      type: Boolean,
+      default: false
+    }
+  }
 }
 </script>
 
 <style>
-.input__auth{
-  margin-left: 5px;
-}
 .btn {
   margin-left: auto;
   display: flex;

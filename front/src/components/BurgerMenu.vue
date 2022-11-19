@@ -1,14 +1,14 @@
 <!--suppress CssUnusedSymbol -->
 <!-- Надо будет придумать как переименовать сам файл, чтобы он подходил под общую структуру -->
 <template>
-  <header>
+  <div>
       <Slide id="Slide">
         <h1>BELAZZZ NOTEBOOK</h1>
-        <router-link to="/">Задания</router-link>
+        <router-link to="/tasks">Задания</router-link>
         <router-link to="/clients">Список клиентов</router-link>
       </Slide>
     <router-view />
-  </header>
+  </div>
 </template>
 
 <script>
@@ -17,7 +17,7 @@ export default {
   name: "burger-menu",
   components: {
     Slide,
-  },
+  }
 };
 </script>
 
