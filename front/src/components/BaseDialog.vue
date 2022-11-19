@@ -11,7 +11,7 @@
 
 <script>
 export default {
-  name: "my-dialog",
+  name: "base-dialog",
   props: {
     show: {
       type: Boolean,

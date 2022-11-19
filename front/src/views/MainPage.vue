@@ -1,5 +1,5 @@
 <template>
-  <my-nav-bar>
+  <navbar>
     <div  v-if="tasks.length !== 0" class="btn__input">
       <button type="button"
               v-if="dbRole === 'administrator' "
@@ -12,18 +12,18 @@
               @click="changeUser"
               class="btn btn-warning">Выйти</button>
     </div>
-  </my-nav-bar>
+  </navbar>
 
   <div class="app">
     <div v-if="isLogin === false">
       <div class="input__auth">
-        <my-input v-model="username"
+        <base-input v-model="username"
                   placeholder="Логин"/>
         <!--
         Не совсем понимаю зачем делать отдельный input, если можно использовать обычный со стилем
         Но ладно, хрен с тобой
         -->
-        <my-input v-model="password"
+        <base-input v-model="password"
                   placeholder="Пароль" type="password"/>
       </div>
 
@@ -33,22 +33,22 @@
       </div>
     </div>
     <div v-else>
-      <my-tasks-list :tasks="tasks"
+      <task-list :tasks="tasks"
                      @create_task="createTaskDialog"
       />
 
-      <my-dialog v-model:show="add_dialog_visible">
-        <my-create-user :roles="allDbRoles" @createUser="createUser"/>
-      </my-dialog>
+      <base-dialog v-model:show="add_dialog_visible">
+        <user-create-popup :roles="allDbRoles" @createUser="createUser"/>
+      </base-dialog>
 
-      <my-dialog v-model:show="add_task_dialog_visible">
-        <my-create-task :all_priority_codes="priority_codes"
+      <base-dialog v-model:show="add_task_dialog_visible">
+        <task-create-popup :all_priority_codes="priority_codes"
                         :all_task_type_codes="tasks_type_classifier"
                         :all_employees="employees"
                         :role="dbRole"
                         @createTask="createTask"
         />
-      </my-dialog>
+      </base-dialog>
 
     </div>
   </div>
@@ -57,21 +57,21 @@
 <script>
 
 import axios from "axios";
-import MyTasksList from "@/components/TasksList";
-import MyInput from "@/components/UA/MyInput";
-import MyCreateUser from "@/components/CreateUser";
-import MyCreateTask from "@/components/UA/CreateTask";
-import MyNavBar from "@/components/UA/MyNavBar";
+import TaskList from "@/components/TaskList";
+import BaseInput from "@/components/BaseInput";
+import UserCreatePopup from "@/components/UserCreatePopup";
+import TaskCreatePopup from "@/components/TaskCreatePopup";
+import NavBar from "@/components/NavBar";
 
 
 export default {
-  name: "my-main-page",
+  name: "main-page",
   components: {
-    MyCreateTask,
-    MyCreateUser,
-    MyInput,
-    MyTasksList,
-    MyNavBar
+    TaskCreatePopup,
+    UserCreatePopup,
+    BaseInput,
+    TaskList,
+    NavBar
   },
 
 

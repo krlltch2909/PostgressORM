@@ -1,14 +1,15 @@
+<!--suppress ALL -->
 <template>
-  <my-main-page/>
+  <main-page/>
 </template>
 
 <script>
 
 
-import MyMainPage from "@/components/MainPage";
+import MainPage from "@/views/MainPage";
 export default {
   name: 'App',
-  components: {MyMainPage},
+  components: {MainPage},
 }
 </script>
 

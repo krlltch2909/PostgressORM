@@ -1,4 +1,5 @@
 <!--suppress CssUnusedSymbol -->
+<!-- Надо будет придумать как переименовать сам файл, чтобы он подходил под общую структуру -->
 <template>
   <header>
       <Slide id="Slide">
