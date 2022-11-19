@@ -1,6 +1,7 @@
 import datetime
 from typing import Optional
 
+from django.http import HttpResponse
 from psycopg2 import sql
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -20,8 +21,8 @@ def init_connection(user: str, password: str):
                             user=user,
                             password=password,
                             # host='95.165.30.171',
-                            host='postgres',
-                            port='5432'
+                            host='127.0.0.1',
+                            port='54321'
                             )
 
     cursor = conn.cursor()
@@ -67,28 +68,29 @@ def close_conn(conn, cursor):
 
 # класс для авторизации и получения токена
 class AuthAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def post(self, request):
 
         try:
             login: str = request.data['login']
             password: str = request.data['password']
+
         except MultiValueDictKeyError as e:
             return Response({"error": "body was incorrect"})
 
         try:
             conn, cursor = init_connection(user=login, password=password)
         except psycopg2.OperationalError as e:
-            return {"error": "incorect login or password"}
-
+            return Response({"error": "incorrect login or password"}
+)
         close_conn(conn, cursor)
 
         s = SessionStore()
         s['login'] = login
         s['password'] = password
 
-        # s.set_expiry(60)
+        s.set_expiry(60)
 
         s.create()
 
@@ -116,10 +118,12 @@ class TasksApiView(APIView):
     permission_classes = [IsAuthenticated, ]
 
     def get(self, request):
+
         try:
-            raw_session: str = self.request.headers['Cookie']
+            raw_session: str = self.request.headers['cookie']
             session = raw_session.split(' ')
-            s = SessionStore(session_key=session[1])
+
+            s = SessionStore(session_key=session[1][:-1])
             login = s['login']
             password = s['password']
 
