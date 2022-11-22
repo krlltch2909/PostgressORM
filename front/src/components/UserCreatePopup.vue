@@ -14,7 +14,7 @@
 
       <base-select :options="roles" v-model="selectedRole"/>
 
-      <button type="button" @click="createNewPost" class="btn btn-success">create</button>
+      <button id="confirm-create-user-btn" type="button" @click="createNewPost" class="btn">Создать</button>
     </form>
   </div>
 </template>
@@ -62,7 +62,7 @@ export default {
 <style scoped>
 
 
-.btn {
+#confirm-create-user-btn {
   margin-top: 15px;
   align-self: flex-end;
 }

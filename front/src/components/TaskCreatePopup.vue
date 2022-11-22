@@ -8,7 +8,7 @@
       </div>
     </div>
 
-    <div class="select__name">
+    <div class="select-name">
       <b>Дата исполнения</b>
       <!-- TODO: Исправить Datepicker -->
       <Datepicker
@@ -20,7 +20,7 @@
     </div>
 
 
-    <div class="select__name">
+    <div class="select-name">
       <h6>Тип задачи</h6>
       <base-select
           :options="all_task_type_codes"
@@ -28,7 +28,7 @@
     </div>
 
 
-    <div class="select__name">
+    <div class="select-name">
       <h6>Приоритет</h6>
       <base-select
           :options="all_priority_codes"
@@ -36,12 +36,12 @@
     </div>
 
 
-    <div  v-if="role !== 'worker'" class="select__name">
+    <div  v-if="role !== 'worker'" class="select-name">
       <h6>Исполнитель</h6>
       <base-select :options="all_employees" v-model="performer_login"/>
     </div>
 
-    <div class="create__contract">
+    <div class="create-contract">
       <b>Внести новый контракт</b>
       <input class="form-check-input mt-0"
              v-model="createNewContract" type="checkbox"
@@ -62,7 +62,7 @@
     </div>
 
 
-    <button type="button" @click="createNewTask" class="btn btn-success">Создать</button>
+    <button id="create__contract__btn" type="button" @click="createNewTask" class="btn">Создать</button>
   </div>
 </template>
 
@@ -179,17 +179,17 @@ export default {
 </script>
 
 <style scoped>
-.create__contract{
+.create-contract{
   display: flex;
   align-items: center;
   margin: 10px;
 }
-.date__input{
+.date-input{
   border: 1px solid black;
   width: 100%;
   border-radius: 5px;
 }
-.select__name{
+.select-name{
   display: flex;
   margin: 5px;
   width: 100%;

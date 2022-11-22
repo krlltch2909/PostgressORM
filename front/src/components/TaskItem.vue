@@ -15,8 +15,8 @@
       </div>
     </div>
 
-    <div class="task__button">
-      <button type="button" class="btn btn-danger"
+    <div class="task-button">
+      <button type="button" class="btn"
               @click="$emit('show_task_changer', task)"
       >Редактировать</button>
     </div>
@@ -49,7 +49,7 @@ export default {
   display: flex;
   align-items: center;
 }
-.task__button{
+.task-button{
   margin-left: auto;
 }
 .v_else{

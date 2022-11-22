@@ -1,13 +1,15 @@
 <template>
-  <navbar :login="login">
+  <main class="layout-content">
+    <div class="task-headers">
+      <h2>Список задач</h2>
+      <button id="add-task"
+              @click="$emit('create_task')"
+              class="btn">Создать задачу</button>
+    </div>
     <task-list :tasks="tasks"
                @create_task="createTaskDialog"
     />
-
-    <base-dialog v-model:show="add_dialog_visible">
-      <user-create-popup :roles="allDbRoles" @createUser="createUser"/>
-    </base-dialog>
-
+  </main>
     <base-dialog v-model:show="add_task_dialog_visible">
       <task-create-popup :all_priority_codes="priority_codes"
                          :all_task_type_codes="tasks_type_classifier"
@@ -16,19 +18,7 @@
                          @createTask="createTask"
       />
     </base-dialog>
-    <div  v-if="tasks.length !== 0" class="btn__input">
-      <button type="button"
-              v-if="dbRole === 'administrator' "
-              style="margin-left: 20px"
-              @click="addUserDialog"
-              class="btn btn-warning">Создать пользователя</button>
 
-      <button type="button"
-              style="margin-left: 20px"
-              @click="changeUser"
-              class="btn btn-warning">Выйти</button>
-    </div>
-  </navbar>
 </template>
 
 <script>
@@ -38,17 +28,15 @@ import TaskList from "@/components/TaskList";
 import BaseInput from "@/components/BaseInput";
 import UserCreatePopup from "@/components/UserCreatePopup";
 import TaskCreatePopup from "@/components/TaskCreatePopup";
-import NavBar from "@/components/NavBar";
 
 
 export default {
-  name: "main-page",
+  name: "task-page",
   components: {
     TaskCreatePopup,
     UserCreatePopup,
     BaseInput,
-    TaskList,
-    NavBar
+    TaskList
   },
 
 
@@ -56,14 +44,6 @@ export default {
     return{
       username: 'nick',
       password: 'qwerty',
-
-
-      // Ну так-то это в бэкенде должно быть
-      allDbRoles: [
-        {id: 1, value:'worker'},
-        {id: 2, value:'manager'},
-        {id: 3, value:'administrator'},
-      ],
 
       dbRole: '',
 
@@ -79,7 +59,6 @@ export default {
         }
       },
       // видимость диалогов
-      add_dialog_visible: false,
       add_task_dialog_visible: false,
 
       // для выпадающих списков
@@ -91,18 +70,6 @@ export default {
 
 
   methods:{
-    changeUser(){
-      this.username = ''
-      this.password = ''
-      this.dbRole = ''
-      this.tasks = []
-      this.login = false
-    },
-
-    addUserDialog(){
-      this.add_dialog_visible = true
-    },
-
     createTaskDialog(){
       this.add_task_dialog_visible = true
     },
@@ -150,35 +117,6 @@ export default {
           console.log(e)
       }
 
-    },
-
-    // создание нового пользователя
-    async createUser(user) {
-      try {
-
-        const url = process.env.VUE_APP_API + '/users/?username=' + this.username + '&password=' + this.password
-
-        let formData = new FormData();
-
-        formData.append('login', user['login']);
-        formData.append('password', user['password']);
-        formData.append('name', user['user_name']);
-        formData.append('role', user['role']);
-
-
-        const response = await axios.post(url, formData, this.config)
-
-
-        if (response.data === 200){
-          alert(e)
-        }
-        else {
-          this.add_dialog_visible = false
-        }
-
-      } catch (e) {
-        alert(e)
-      }
     },
 
     // парсинг самих заданий
@@ -332,29 +270,16 @@ export default {
     },
 
   },
-  props: {
-    login: {
-      type: Boolean,
-      default: false
-    }
-  }
 }
 </script>
 
 <style>
-.btn {
+.task-headers{
+  display: flex;
+  align-items: center;
+}
+#add-task{
   margin-left: auto;
   display: flex;
-  background-color: #00abc3;
-  border-color: #00abc3;
-  color: #fff;
 }
-.btn:hover {
-  background-color: #00a896;
-  border-color: #00a896;
-}
-.btn__input{
-  display: flex;
-}
-
 </style>
