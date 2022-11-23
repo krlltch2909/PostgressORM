@@ -1,16 +1,17 @@
 import datetime
 from typing import Optional
 
-from django.http import HttpResponse
 from psycopg2 import sql
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.utils.datastructures import MultiValueDictKeyError
-from djangoProject.settings import ADMIN_PASSWORD, ADMIN_LOGIN
+
 from django.contrib.sessions.backends.db import SessionStore
 import psycopg2
 import os
+
+from djangoProject.settings import ADMIN_LOGIN, ADMIN_PASSWORD
 
 
 # Create your views here.
@@ -21,8 +22,8 @@ def init_connection(user: str, password: str):
                             user=user,
                             password=password,
                             # host='95.165.30.171',
-                            host='127.0.0.1',
-                            port='54321'
+                            host='postgres',
+                            port='5432'
                             )
 
     cursor = conn.cursor()
@@ -33,8 +34,7 @@ def init_connection(user: str, password: str):
 def execute_post_query(query: sql, login: str, password: str):
     try:
         conn, cursor = init_connection(user=login, password=password)
-    except psycopg2.OperationalError as e:
-        return {"errer": "error in login or password"}
+    except psycopg2.OperationalError as e: return {"errer": "error in login or password"}
 
     try:
         cursor.execute(query.as_string(conn))
@@ -96,7 +96,7 @@ class AuthAPIView(APIView):
 
         response = Response()
         response.set_cookie('cookie', f'Session {s.session_key}')
-
+        print(response.headers)
         return response
         # return Response({"session token": s.session_key})
 

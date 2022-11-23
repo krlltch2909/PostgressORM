@@ -16,13 +16,12 @@ import environ
 env = environ.Env()
 environ.Env.read_env()
 
-ADMIN_LOGIN = env('ADMIN_LOGIN')
-ADMIN_PASSWORD = env('ADMIN_PASSWORD')
-
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+ADMIN_LOGIN = env('ADMIN_LOGIN')
+ADMIN_PASSWORD = env('ADMIN_PASSWORD')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -90,11 +89,24 @@ CORS_ORIGIN_ALLOW_ALL = True
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+           'default': {
+               'ENGINE': 'django.db.backends.postgresql',
+               'HOST': 'postgres',
+               'PORT': '5432',
+               'USER': env('ADMIN_LOGIN'),
+               'PASSWORD': env('ADMIN_PASSWORD'),
+               'NAME': 'demo' 
+               }
+           }
+
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
