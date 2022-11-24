@@ -14,6 +14,7 @@
     </div>
     <task-list :tasks="tasks"
                @create_task="createTaskDialog"
+               @show_task_changer="editTaskDialog"
     />
   </main>
     <base-dialog v-model:show="add_task_dialog_visible">
@@ -22,6 +23,16 @@
                          :all_employees="employees"
                          :role="dbRole"
                          @createTask="createTask"
+      />
+    </base-dialog>
+
+    <base-dialog v-model:show="edit_task_dialog_visible">
+      <task-edit-popup :all_priority_codes="priority_codes"
+                       :all_task_type_codes="tasks_type_classifier"
+                       :all_employees="employees"
+                       :role="dbRole"
+                       :task="task"
+                       @editTask="editTaskDialog"
       />
     </base-dialog>
 
@@ -36,6 +47,8 @@ import UserCreatePopup from "@/components/UserCreatePopup";
 import TaskCreatePopup from "@/components/TaskCreatePopup";
 import router from "@/router";
 import store from "@/store";
+import BaseDialog from "@/components/BaseDialog";
+import TaskEditPopup from "@/components/TaskEditPopup";
 
 
 // IDE-шка врёт, что beforeMount не используется и меня это бесит
@@ -43,7 +56,9 @@ import store from "@/store";
 export default {
   name: "task-page",
   components: {
+    BaseDialog,
     TaskCreatePopup,
+    TaskEditPopup,
     UserCreatePopup,
     BaseInput,
     TaskList
@@ -67,6 +82,8 @@ export default {
       priority_codes: [],
       // видимость диалогов
       add_task_dialog_visible: false,
+      edit_task_dialog_visible: false,
+      task: {},
 
       // для выпадающих списков
       priorityCodeSort: ''
@@ -77,6 +94,12 @@ export default {
   methods:{
     createTaskDialog(){
       this.add_task_dialog_visible = true
+    },
+
+    editTaskDialog(task){
+      console.log(task.performer_number)
+      this.task = task;
+      this.edit_task_dialog_visible = true;
     },
 
     // создание нового задания
