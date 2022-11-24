@@ -3,7 +3,7 @@
     <div class="task-headers">
       <h2>Список задач</h2>
       <button id="add-task"
-              @click="$emit('create_task')"
+              @click="add_task_dialog_visible = true"
               class="btn">Создать задачу</button>
     </div>
     <task-list :tasks="tasks"
