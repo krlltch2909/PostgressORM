@@ -34,7 +34,8 @@ def init_connection(user: str, password: str):
 def execute_post_query(query: sql, login: str, password: str):
     try:
         conn, cursor = init_connection(user=login, password=password)
-    except psycopg2.OperationalError as e: return {"errer": "error in login or password"}
+    except psycopg2.OperationalError as e: 
+        return {"errer": "error in login or password"}
 
     try:
         cursor.execute(query.as_string(conn))
@@ -90,7 +91,7 @@ class AuthAPIView(APIView):
         s['login'] = login
         s['password'] = password
 
-        s.set_expiry(60)
+        # s.set_expiry(60)
 
         s.create()
 
@@ -118,14 +119,12 @@ class TasksApiView(APIView):
     permission_classes = [IsAuthenticated, ]
 
     def get(self, request):
-
         try:
-            raw_session: str = self.request.headers['cookie']
+            raw_session: str = self.request.headers['Cookie'].split('=')[1]
             session = raw_session.split(' ')
-
             s = SessionStore(session_key=session[1][:-1])
-            login = s['login']
-            password = s['password']
+            login = s.get('login')
+            password = s.get('password')
 
         except Exception:
             return Response({"error": "incorrect token"})
@@ -159,11 +158,11 @@ class TasksApiView(APIView):
 
     def post(self, request):
         try:
-            raw_session: str = self.request.headers['Cookie']
+            raw_session: str = self.request.headers['Cookie'].split('=')[1]
             session = raw_session.split(' ')
-            s = SessionStore(session_key=session[1])
-            login = s['login']
-            password = s['password']
+            s = SessionStore(session_key=session[1][:-1])
+            login = s.get('login')
+            password = s.get('password')
 
         except Exception:
             return Response({"error": "incorrect token"})
@@ -197,11 +196,11 @@ class TasksApiView(APIView):
 
     def put(self, request):
         try:
-            raw_session: str = self.request.headers['Cookie']
+            raw_session: str = self.request.headers['Cookie'].split('=')[1]
             session = raw_session.split(' ')
-            s = SessionStore(session_key=session[1])
-            login = s['login']
-            password = s['password']
+            s = SessionStore(session_key=session[1][:-1])
+            login = s.get('login')
+            password = s.get('password')
 
         except Exception:
             return Response({"error": "incorrect token"})
@@ -263,11 +262,12 @@ class TaskTypeApiView(APIView):
             raw_session: str = self.request.headers['Cookie']
             session = raw_session.split(' ')
             s = SessionStore(session_key=session[1])
-            login = s['login']
-            password = s['password']
 
         except Exception:
             return Response({"error": "incorrect token"})
+
+        login = ADMIN_LOGIN
+        password = ADMIN_PASSWORD
 
         sql_script = "SELECT * FROM public.task_type_classifier"
 
@@ -295,11 +295,13 @@ class TaskPriorityApiView(APIView):
             raw_session: str = self.request.headers['Cookie']
             session = raw_session.split(' ')
             s = SessionStore(session_key=session[1])
-            login = s['login']
-            password = s['password']
 
         except Exception:
             return Response({"error": "incorrect token"})
+
+        login = ADMIN_LOGIN
+        password = ADMIN_PASSWORD
+
         sql_script = "SELECT * FROM public.priority_classifier"
 
         response_data = execute_command(sql_script, login, password)
@@ -324,11 +326,11 @@ class EmlpoyeeApiView(APIView):
     def get(self, request):
 
         try:
-            raw_session: str = self.request.headers['Cookie']
+            raw_session: str = self.request.headers['Cookie'].split('=')[1]
             session = raw_session.split(' ')
-            s = SessionStore(session_key=session[1])
-            login = s['login']
-            password = s['password']
+            s = SessionStore(session_key=session[1][:-1])
+            login = s.get('login')
+            password = s.get('password')
 
         except Exception:
             return Response({"error": "incorrect token"})
@@ -354,21 +356,27 @@ class ContractApiView(APIView):
     permission_classes = [IsAuthenticated, ]
 
     def post(self, request):
+        
         try:
-            raw_session: str = self.request.headers['Cookie']
+            raw_session: str = self.request.headers['Cookie'].split('=')[1]
             session = raw_session.split(' ')
-            s = SessionStore(session_key=session[1])
-            login = s['login']
-            password = s['password']
+            s = SessionStore(session_key=session[1][:-1])
 
         except Exception:
             return Response({"error": "incorrect token"})
+
+        login = ADMIN_LOGIN
+        password = ADMIN_PASSWORD
+
         try:
             contract_details: Optional[str] = request.data['contract_details']
             vin = request.data['vin']
             license_plate = request.data['license_plate']
         except MultiValueDictKeyError:
             return Response({"error": "body was incorrect"})
+
+        if len(vin) > 17 or len(license_plate) > 9:
+            return Response({"error": "data in body was incorrect"})
 
         sql_script = sql.SQL(
             f"INSERT INTO contract(contract_details, vin, license_plate, contact_person_number) VALUES ('{contract_details}', '{vin}', '{license_plate}', null)")
@@ -388,17 +396,17 @@ class UserApiView(APIView):
     def get(self, request):
 
         try:
-            raw_session: str = self.request.headers['Cookie']
+            raw_session: str = self.request.headers['Cookie'].split('=')[1]
             session = raw_session.split(' ')
-            s = SessionStore(session_key=session[1])
-            login = s['login']
-            password = s['password']
-            login_for_check = s['login']
+            s = SessionStore(session_key=session[1][:-1])
+            login = s.get('login')
+            password = s.get('password')
+
         except Exception:
             return Response({"error": "incorrect token"})
 
         sql_script = f"SELECT login, employee_position FROM public.employees " \
-                     f"JOIN position_classifier USING(position_code) WHERE login='{login_for_check}'"
+                     f"JOIN position_classifier USING(position_code) WHERE login='{login}'"
 
         response_data = execute_command(sql_script, login, password)[0]
 
@@ -412,11 +420,12 @@ class UserApiView(APIView):
     def post(self, request):
 
         try:
-            raw_session: str = self.request.headers['Cookie']
+            raw_session: str = self.request.headers['Cookie'].split('=')[1]
             session = raw_session.split(' ')
-            s = SessionStore(session_key=session[1])
-            login = s['login']
-            password = s['password']
+            s = SessionStore(session_key=session[1][:-1])
+            login = s.get('login')
+            password = s.get('password')
+
         except Exception:
             return Response({"error": "incorrect token"})
 
@@ -452,9 +461,10 @@ class ContactPersonAPIView(APIView):
 
     def get(self, request):
         try:
-            raw_session: str = self.request.headers['Cookie']
+            raw_session: str = self.request.headers['Cookie'].split('=')[1]
             session = raw_session.split(' ')
-            SessionStore(session_key=session[1])
+            s = SessionStore(session_key=session[1][:-1])
+
         except Exception:
             return Response({"error": "incorrect token"})
 
@@ -487,9 +497,10 @@ class OrganizationAPIView(APIView):
 
     def get(self, request):
         try:
-            raw_session: str = self.request.headers['Cookie']
+            raw_session: str = self.request.headers['Cookie'].split('=')[1]
             session = raw_session.split(' ')
-            SessionStore(session_key=session[1])
+            s = SessionStore(session_key=session[1][:-1])
+
         except Exception:
             return Response({"error": "incorrect token"})
 
