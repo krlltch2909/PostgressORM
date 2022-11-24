@@ -277,13 +277,17 @@ export default {
       }
     },
 
-    //TODO: !проверить! не факт,что оно рабочее
-    //export tasks to excel
+    // Пока что в виде JSON, может быть сделаю потом конвертацию в Excel
     exportTasks(){
-      const wb = XLSX.utils.book_new()
-      const ws = XLSX.utils.json_to_sheet(this.tasks)
-      XLSX.utils.book_append_sheet(wb, ws, 'tasks')
-      XLSX.writeFile(wb, 'tasks.xlsx')
+      const data = JSON.stringify(this.tasks)
+      const blob = new Blob([data], {type: 'application/json'})
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', 'tasks.json')
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
     },
   },
 
