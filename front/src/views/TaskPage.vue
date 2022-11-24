@@ -187,7 +187,6 @@ export default {
       this.tasks.forEach((element) =>{
         element.priority_code = this.priority_codes.find(el => el.id === element.priority_code)['value']
         element.task_type_code = this.tasks_type_classifier.find(el => el.id === element.task_type_code)['value']
-
       })
 
       if (this.dbRole === ''){
@@ -255,7 +254,7 @@ export default {
             + localStorage.getItem('username') + '&password=' + localStorage.getItem('password'), this.getConfig)
         const array = response.data['employees']
 
-        array.forEach((element)=> {
+        array.forEach((element) => {
           const newEmployee = {
             id: element['employee_id'],
             value: element['login'],  // value = login
@@ -263,13 +262,9 @@ export default {
           this.employees.push(newEmployee)
         })
 
-        this.tasks.forEach((element) =>{
-          if (element.author_number !== null) {
-            element.author_number = this.employees.find(el => el.id === element.author_number)['value']
-          }
-          if (element.performer_number !== null) {
-            element.performer_number = this.employees.find(el => el.id === element.performer_number)['value']
-          }
+        this.tasks.forEach((element) => {
+          element.performer_number = this.employees.find(el => el.id === element.performer_number)['value']
+          element.author_number = this.employees.find(el => el.id === element.author_number)['value']
         })
       }
       catch (e){
