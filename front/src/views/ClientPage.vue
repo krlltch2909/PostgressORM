@@ -1,8 +1,11 @@
 <template>
   <main class="layout">
-    <h2>Список клиентов</h2>
+    <div class="client-header">
+      <h2>Список клиентов</h2>
+      <input type="text" v-model="search" style="margin-left: 2rem" placeholder="Найти клиента..."/>
+    </div>
     <transition-group name="post-list">
-      <client-item v-for="client in clients"
+      <client-item v-for="client in filteredList"
                    :clients="client"
                    :key="client.contact_person_number"
       />
@@ -20,10 +23,16 @@ export default {
     getConfig() {
       return this.$store.getters.getConfig;
     },
+    filteredList() {
+      return this.clients.filter(client => {
+        return client.contact_person_name.toLowerCase().includes(this.search.toLowerCase())
+      })
+    }
   },
 
   data(){
     return {
+      search: '',
       clients: [],
       organizations: [],
     };
@@ -74,3 +83,10 @@ export default {
   }
 }
 </script>
+
+<style>
+.client-header{
+  display: flex;
+  align-items: center;
+}
+</style>
