@@ -28,8 +28,11 @@ import TaskList from "@/components/TaskList";
 import BaseInput from "@/components/BaseInput";
 import UserCreatePopup from "@/components/UserCreatePopup";
 import TaskCreatePopup from "@/components/TaskCreatePopup";
+import router from "@/router";
 
 
+// IDE-шка врёт, что beforeMount не используется и меня это бесит
+// noinspection JSUnusedGlobalSymbols
 export default {
   name: "task-page",
   components: {
@@ -122,6 +125,8 @@ export default {
     // парсинг самих заданий
     async getTasks(){
       try {
+        if (!this.$store.state.loggedIn) return router.push('/')
+
         const response = await axios.get(process.env.VUE_APP_API + '/tasks/?username=' + this.username + '&password=' + this.password, this.config)
         const array = response.data['tasks']
 
@@ -156,7 +161,6 @@ export default {
           this.tasks.push(newTask)
 
         })
-        this.login = true
 
       }
       catch (e){
@@ -270,6 +274,11 @@ export default {
     },
 
   },
+
+  // Эта штука позволяет нам отображать таски до того, как страница загрузится
+  beforeMount() {
+    this.getTasks()
+  }
 }
 </script>
 
