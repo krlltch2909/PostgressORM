@@ -10,13 +10,9 @@
 
     <div class="select-name">
       <b>Дата исполнения</b>
-      <!-- TODO: Исправить Datepicker -->
-      <Datepicker
-          v-model="task.term_of_execution"
-          :format="DatePickerFormat"
-          :disable-time-range-validation="true"
-          :disabled-dates="disableDates"
-             />
+      <input id="date" type="date"
+             class="date__input"
+             v-model="task.term_of_execution">
     </div>
 
 
@@ -104,8 +100,6 @@ export default {
         task_type_code: '',
         performer_id: '',
       },
-      DatePickerFormat: 'YYYY-MM-DD',
-      disableDates: new Date(Date.now()),
       contract: {
         contract_details: '',
         vin: '',
