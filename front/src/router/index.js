@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Clients from '../views/Clients.vue'
+import ClientPage from '../views/ClientPage.vue'
 import MainPage from "@/views/TaskPage.vue";
 import LoginPage from "@/views/LoginPage";
 
@@ -17,7 +17,7 @@ const routes = [
   {
     path: "/clients",
     name: "clients",
-    component: Clients
+    component: ClientPage
   }
 ];
 

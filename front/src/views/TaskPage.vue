@@ -265,10 +265,10 @@ export default {
 
         this.tasks.forEach((element) =>{
           if (element.author_number !== null) {
-            element.author_number = this.employees.find(el => el.id === element.author_number)['login']
+            element.author_number = this.employees.find(el => el.id === element.author_number)['value']
           }
           if (element.performer_number !== null) {
-            element.performer_number = this.employees.find(el => el.id === element.performer_number)['login']
+            element.performer_number = this.employees.find(el => el.id === element.performer_number)['value']
           }
         })
       }
