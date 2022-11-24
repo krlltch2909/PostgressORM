@@ -45,7 +45,7 @@ export default {
   padding: 20px;
   border: 2px solid #00abc3;
   border-radius: 10px;
-  margin: 15px;
+  margin-top: 1rem;
   display: flex;
   align-items: center;
 }

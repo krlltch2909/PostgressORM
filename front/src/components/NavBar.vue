@@ -8,7 +8,7 @@
           type="button"
           class="btn"
           v-if="dbRole === 'administrator'"
-          style="margin-left: 20px"
+          style="margin-right: 1rem"
           @click="addUserDialog">Создать пользователя</button>
 
       <button
@@ -40,8 +40,14 @@ export default {
   },
   computed: {
     loggedIn(){
-      return this.$store.state.loggedIn
-    }
+      return this.$store.getters.getLoggedIn;
+    },
+    getConfig(){
+      return this.$store.getters.getConfig;
+    },
+    dbRole(){
+      return this.$store.getters.getRole;
+    },
   },
 
   data(){
@@ -59,9 +65,10 @@ export default {
 
   methods: {
     async changeUser() {
-      this.username = ''
-      this.password = ''
-      this.dbRole = ''
+      localStorage.setItem('token', '');
+      localStorage.setItem('username', '');
+      localStorage.setItem('password', '');
+      this.$store.commit('setRole', null);
       this.tasks = []
       this.$store.commit('setLoggedIn', false)
 
@@ -76,7 +83,8 @@ export default {
     async createUser(user) {
       try {
 
-        const url = process.env.VUE_APP_API + '/users/?username=' + this.username + '&password=' + this.password
+        const url = process.env.VUE_APP_API + '/users/?username='
+            + localStorage.getItem('username') + '&password=' + localStorage.getItem('password')
 
         let formData = new FormData();
 
@@ -86,7 +94,7 @@ export default {
         formData.append('role', user['role']);
 
 
-        const response = await axios.post(url, formData, this.config)
+        const response = await axios.post(url, formData, this.getConfig())
 
 
         if (response.data === 200){
@@ -114,6 +122,7 @@ header {
   padding: 20px;
 }
 .navbar-buttons {
+  display: flex;
   margin-left: auto;
 }
 .app-name{

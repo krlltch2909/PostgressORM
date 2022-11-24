@@ -22,39 +22,35 @@
 
 import axios from "axios";
 import BaseInput from "@/components/BaseInput";
-import NavBar from "@/components/NavBar";
 import router from "@/router";
-import BurgerMenu from "@/components/BurgerMenu";
+import store from "@/store";
 
 
 export default {
   name: "login-page",
   components: {
-    BurgerMenu,
     BaseInput,
-    NavBar
+  },
+  computed:{
+    getConfig(){
+      return store.getters.getConfig;
+    }
   },
 
   data(){
     return{
       username: 'nick',
       password: 'qwerty',
-
-      isLogin: false,
-
-      config: {
-        headers:{
-          // ХАРДКОД (╯°□°）╯︵ ┻━┻
-          'Authorization': 'Token e222cdf2fae4ff2e6494640269f150b4ff52f468'
-        }
-      }
     }
   },
   methods: {
     async getTasks() {
       try {
-        const response = await axios.get(process.env.VUE_APP_API + '/tasks/?username=' + this.username + '&password=' + this.password, this.config)
-        localStorage.setItem('token', response.data.token)
+        const response = await axios.get(process.env.VUE_APP_API + '/tasks/?username=' + this.username + '&password=' + this.password, this.getConfig);
+        localStorage.setItem('username', this.username)
+        localStorage.setItem('password', this.password)
+        const roleResponse = await axios.get(process.env.VUE_APP_API + '/users/?login=' + localStorage.getItem('username'), this.getConfig)
+        this.$store.commit('setRole', roleResponse.data['iAm']['role'])
         this.$store.commit('setLoggedIn', true)
         await router.push({name: 'tasks'})
 

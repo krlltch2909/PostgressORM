@@ -5,7 +5,6 @@
       <h1>BELAZZZ NOTEBOOK</h1>
       <router-link to="/tasks">Задания</router-link>
       <router-link to="/clients">Список клиентов</router-link>
-      <button id="export-btn" class="btn">Экспорт данных</button>
     </Slide>
   </div>
 </template>
@@ -52,10 +51,5 @@ nav a.router-link-exact-active {
 nav h1 {
   color: #f6f9e5;
   margin: 5px 0;
-}
-#export-btn {
-  position: absolute;
-  bottom: 2rem;
-  left: 8rem;
 }
 </style>

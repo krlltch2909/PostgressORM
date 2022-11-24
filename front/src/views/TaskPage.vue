@@ -2,9 +2,15 @@
   <main class="layout-content">
     <div class="task-headers">
       <h2>Список задач</h2>
-      <button id="add-task"
-              @click="add_task_dialog_visible = true"
-              class="btn">Создать задачу</button>
+      <div class="task-buttons">
+        <button id="export-btn"
+                style="margin-right: 1rem"
+                @click="exportTasks"
+                class="btn">Экспорт данных</button>
+        <button id="add-task"
+                @click="add_task_dialog_visible = true"
+                class="btn">Создать задачу</button>
+      </div>
     </div>
     <task-list :tasks="tasks"
                @create_task="createTaskDialog"
@@ -29,6 +35,7 @@ import BaseInput from "@/components/BaseInput";
 import UserCreatePopup from "@/components/UserCreatePopup";
 import TaskCreatePopup from "@/components/TaskCreatePopup";
 import router from "@/router";
+import store from "@/store";
 
 
 // IDE-шка врёт, что beforeMount не используется и меня это бесит
@@ -41,33 +48,28 @@ export default {
     BaseInput,
     TaskList
   },
+  computed:{
+    getConfig(){
+      return store.getters.getConfig;
+    },
+    dbRole(){
+      return store.getters.getRole;
+    },
+  },
 
 
   data(){
     return{
-      username: 'nick',
-      password: 'qwerty',
-
-      dbRole: '',
-
       tasks: [],
       tasks_type_classifier: [],
       contracts: [],
       employees: [],
       priority_codes: [],
-      config: {
-        headers:{
-          // ХАРДКОД (╯°□°）╯︵ ┻━┻
-          'Authorization': 'Token e222cdf2fae4ff2e6494640269f150b4ff52f468'
-        }
-      },
       // видимость диалогов
       add_task_dialog_visible: false,
 
       // для выпадающих списков
       priorityCodeSort: ''
-
-
     }
   },
 
@@ -82,7 +84,8 @@ export default {
 
       try {
         if (task.contract_number !== null) {
-          const contract_url = process.env.VUE_APP_API + '/contracts/?username=' + this.username + '&password=' + this.password
+          const contract_url = process.env.VUE_APP_API + '/contracts/?username=' +
+              localStorage.getItem('username') + '&password=' + localStorage.getItem('password')
           let formData = new FormData();
 
           formData.append('contract_details', task.contract_number.contract_details);
@@ -90,12 +93,13 @@ export default {
           formData.append('license_plate', task.contract_number.license_plate);
 
 
-          const response = await axios.post(contract_url, formData, this.config)
+          const response = await axios.post(contract_url, formData, this.getConfig)
 
           task.contract_number = response.data['id'][0][0]
         }
 
-        const url_for_task_add = process.env.VUE_APP_API + '/tasks/?username=' + this.username + '&password=' + this.password
+        const url_for_task_add = process.env.VUE_APP_API + '/tasks/?username='
+            + localStorage.getItem('username') + '&password=' + localStorage.getItem('password')
 
         console.log(task)
 
@@ -108,7 +112,7 @@ export default {
         taskFormData.append('performer_number', task.performer_id);
 
 
-        await axios.post(url_for_task_add, taskFormData, this.config)
+        await axios.post(url_for_task_add, taskFormData, this.getConfig)
 
         this.tasks = []
 
@@ -127,7 +131,8 @@ export default {
       try {
         if (!this.$store.state.loggedIn) return router.push('/')
 
-        const response = await axios.get(process.env.VUE_APP_API + '/tasks/?username=' + this.username + '&password=' + this.password, this.config)
+        const response = await axios.get(process.env.VUE_APP_API + '/tasks/?username='
+            + localStorage.getItem('username') + '&password=' + localStorage.getItem('password'), this.getConfig)
         const array = response.data['tasks']
 
         array.forEach((element)=> {
@@ -167,7 +172,6 @@ export default {
         alert('Неверный логин или пароль')
       }
 
-
       if (this.priority_codes.length === 0){
         await this.getTasksTypeClassifier()
       }
@@ -180,7 +184,6 @@ export default {
         await this.getEmployees()
       }
 
-
       this.tasks.forEach((element) =>{
         element.priority_code = this.priority_codes.find(el => el.id === element.priority_code)['value']
         element.task_type_code = this.tasks_type_classifier.find(el => el.id === element.task_type_code)['value']
@@ -189,7 +192,7 @@ export default {
 
       if (this.dbRole === ''){
         try{
-          const roleResponse = await axios.get(process.env.VUE_APP_API + '/users/?login=' + this.username, this.config)
+          const roleResponse = await axios.get(process.env.VUE_APP_API + '/users/?login=' + localStorage.getItem('username'), this.getConfig)
           this.dbRole = roleResponse.data['iAm']['role']
 
         }
@@ -205,9 +208,9 @@ export default {
       try {
         if (this.tasks_type_classifier.length === 0){
           // cassifier??? Кирюх, не болей дислексией, пжлст
-          let response = await axios.get(process.env.VUE_APP_API + '/tasks_cassifier/', this.config)
+          let response = await axios.get(process.env.VUE_APP_API + '/tasks_cassifier/', this.getConfig)
           if(response.status !== 200) {
-            response = await axios.get(process.env.VUE_APP_API + '/tasks_classifier/', this.config)
+            response = await axios.get(process.env.VUE_APP_API + '/tasks_classifier/', this.getConfig)
           }
           const array = response.data['tasks classifier']
           array.forEach((element)=> {
@@ -229,7 +232,7 @@ export default {
     async getTasksTypeClassifier(){
       try {
           if (this.priority_codes.length === 0){
-            const response = await axios.get(process.env.VUE_APP_API + '/tasks_priority/', this.config)
+            const response = await axios.get(process.env.VUE_APP_API + '/tasks_priority/', this.getConfig)
             const array = response.data['tasks priority']
             array.forEach((element)=> {
               const newPriority = {
@@ -248,7 +251,8 @@ export default {
     // парсинг работников
     async getEmployees(){
       try {
-        const response = await axios.get(process.env.VUE_APP_API + '/employees/?username=' + this.username + '&password=' + this.password, this.config)
+        const response = await axios.get(process.env.VUE_APP_API + '/employees/?username='
+            + localStorage.getItem('username') + '&password=' + localStorage.getItem('password'), this.getConfig)
         const array = response.data['employees']
 
         array.forEach((element)=> {
@@ -273,6 +277,14 @@ export default {
       }
     },
 
+    //TODO: !проверить! не факт,что оно рабочее
+    //export tasks to excel
+    exportTasks(){
+      const wb = XLSX.utils.book_new()
+      const ws = XLSX.utils.json_to_sheet(this.tasks)
+      XLSX.utils.book_append_sheet(wb, ws, 'tasks')
+      XLSX.writeFile(wb, 'tasks.xlsx')
+    },
   },
 
   // Эта штука позволяет нам отображать таски до того, как страница загрузится
@@ -287,7 +299,7 @@ export default {
   display: flex;
   align-items: center;
 }
-#add-task{
+.task-buttons{
   margin-left: auto;
   display: flex;
 }
