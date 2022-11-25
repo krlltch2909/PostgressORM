@@ -1,11 +1,5 @@
 <template>
   <div>
-    <div class="task__worker">
-      <h3>Список задач</h3>
-      <button type="button"
-              @click="$emit('create_task')"
-              class="btn btn-warning">Создать задачу</button>
-    </div>
       <transition-group name="post-list">
         <task-item v-for="task in tasks"
                    :task="task"
@@ -31,11 +25,6 @@ export default {
 </script>
 
 <style scoped>
-.task__worker{
-  display: flex;
-  margin: 15px;
-  align-items: center;
-}
 
 /* Это на будущее что-то?           *
  * TODO: Проверить что это за фигня */

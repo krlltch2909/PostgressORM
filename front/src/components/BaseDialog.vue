@@ -1,6 +1,6 @@
 <template>
   <div class="dialog" v-if="show" @click="hideDialog">
-    <div @click.stop class="dialog__content">
+    <div @click.stop class="dialog-content">
       <slot>
 
       </slot>
@@ -37,7 +37,7 @@ export default {
   display: flex;
 }
 
-.dialog__content{
+.dialog-content{
   margin: auto;
   background: white;
   border-radius: 20px;

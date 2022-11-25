@@ -1,19 +1,18 @@
 <!--suppress CssUnusedSymbol -->
-<!-- Надо будет придумать как переименовать сам файл, чтобы он подходил под общую структуру -->
 <template>
-  <header>
-      <Slide id="Slide">
-        <h1>BELAZZZ NOTEBOOK</h1>
-        <router-link to="/">Задания</router-link>
-        <router-link to="/clients">Список клиентов</router-link>
-      </Slide>
-    <router-view />
-  </header>
+  <div>
+    <Slide id="slide-menu" :closeOnNavigation="true">
+      <h1>BELAZZZ NOTEBOOK</h1>
+      <router-link to="/tasks">Задания</router-link>
+      <router-link to="/clients">Список клиентов</router-link>
+    </Slide>
+  </div>
 </template>
 
 <script>
 import { Slide } from "vue3-burger-menu";
 export default {
+  name: "burger-menu",
   components: {
     Slide,
   },
@@ -21,9 +20,17 @@ export default {
 </script>
 
 <style>
+/*router-link style*/
+a {
+  background-color: #00abc3;
+  color: #f6f9e5;
+  padding: 12px 8px;
+  box-shadow: 1px 2px 4px #2d2d2d;
+  margin: 10px 0;
+}
 .bm-burger-button {
-  top: 18px;
-  left: 15px;
+  top: 1.15rem;
+  left: 1rem;
   width: 20px;
   height: 15px;
   cursor: pointer;
@@ -37,18 +44,12 @@ export default {
 .bm-item-list {
   margin: auto;
 }
-nav router-link {
-  color: #f6f9e5;
-  padding: 11.5px 7.5px;
-  box-shadow: 1px 2px 4px #2d2d2d;
-  margin: 10px 0;
-}
 nav a.router-link-exact-active {
   color: #000;
   background: #f0f3bd;
 }
 nav h1 {
   color: #f6f9e5;
-  margin: 10px 0;
+  margin: 5px 0;
 }
 </style>

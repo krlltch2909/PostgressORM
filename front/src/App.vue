@@ -1,15 +1,15 @@
 <!--suppress ALL -->
 <template>
-  <main-page/>
+  <layout/>
 </template>
 
 <script>
 
 
-import MainPage from "@/views/MainPage";
+import Layout from "@/components/Layout";
 export default {
   name: 'App',
-  components: {MainPage},
+  components: {Layout}
 }
 </script>
 

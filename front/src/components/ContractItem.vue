@@ -23,7 +23,8 @@ export default {
 <style scoped>
 .contract {
   padding: 20px;
-  border: 2px solid teal;
+  border: 2px solid #00abc3;
+  border-radius: 10px;
   margin: 15px;
   align-items: center;
 }

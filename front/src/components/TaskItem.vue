@@ -11,18 +11,15 @@
           <strong>{{key_task}}:</strong>
           <contract-item :contract="values"/>
         </div>
-
+        
       </div>
     </div>
 
-    <div class="task__button">
-      <button type="button" class="btn btn-danger"
-              @click="$emit('show_task_changer', task)"
-      >Редактировать</button>
-    </div>
-
+    <button id="edit-task-btn"
+            type="button"
+            @click="$emit('show_task_changer', task)"
+            class="btn">Редактировать</button>
   </div>
-
 </template>
 
 <script>
@@ -45,11 +42,11 @@ export default {
   padding: 20px;
   border: 2px solid #00abc3;
   border-radius: 10px;
-  margin: 15px;
+  margin-top: 1rem;
   display: flex;
   align-items: center;
 }
-.task__button{
+#edit-task-btn{
   margin-left: auto;
 }
 .v_else{
