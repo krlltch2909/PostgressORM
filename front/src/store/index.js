@@ -6,8 +6,9 @@ const store = createStore({
     role: null,
     config: {
       headers:{
-        // ХАРДКОД (╯°□°）╯︵ ┻━┻
-        'Authorization': 'Token e222cdf2fae4ff2e6494640269f150b4ff52f468'
+        'Authorization': 'Token ' + process.env.VUE_APP_BACKEND_TOKEN,
+        'Content-Type': 'application/json',
+        // TODO: Добавить как-то передачу кук в запросы
       }
     }
   },
@@ -22,7 +23,7 @@ const store = createStore({
     },
     setRole(state, value) {
       state.role = value
-    }
+    },
   },
   actions: {
   },
