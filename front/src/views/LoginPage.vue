@@ -12,7 +12,7 @@
                   placeholder="Пароль" type="password"/>
     </div>
     <div>
-      <button id="enter" type="button" @click="getTasks"
+      <button id="enter" type="button" @click="logIn"
               class="btn">Войти</button>
     </div>
   </div>
@@ -31,31 +31,43 @@ export default {
   components: {
     BaseInput,
   },
-  computed:{
-    getConfig(){
+  computed: {
+    getConfig() {
       return store.getters.getConfig;
     }
   },
 
-  data(){
-    return{
+  data() {
+    return {
       username: 'nick',
       password: 'qwerty',
     }
   },
   methods: {
-    async getTasks() {
+    async logIn() {
       try {
-        const response = await axios.get(process.env.VUE_APP_API + '/tasks/?username=' + this.username + '&password=' + this.password, this.getConfig);
-        localStorage.setItem('username', this.username)
-        localStorage.setItem('password', this.password)
-        const roleResponse = await axios.get(process.env.VUE_APP_API + '/users/?login=' + localStorage.getItem('username'), this.getConfig)
+        const response = await axios.post(process.env.VUE_APP_API + '/auth/', {
+          login: this.username,
+          password: this.password
+        }, this.getConfig);
+        if (response.status !== 200) return alert('Неверный логин или пароль');
+
+        // По-хорошему надо бы сделать нормальное сохранение куки, мб через vue-cookies
+        // Но у меня не получалось его настроить, поэтому пока так
+
+        // this.$cookies.set('token', response.data.token, '1D', '/', '', false, 'Strict');
+        // console.log(this.$cookies)
+
+        // Поставить куки мы поставили, теперь их надо как-то передавать. Так что пока это TODO.
+        document.cookie = `token=${response.data.token}; path=/; expires=${new Date(Date.now() + 86400e3).toUTCString()};`;
+
+        // localStorage.setItem('session', response.data.token);
+        const roleResponse = await axios.get(process.env.VUE_APP_API + '/users/', this.getConfig)
         this.$store.commit('setRole', roleResponse.data['iAm']['role'])
         this.$store.commit('setLoggedIn', true)
         await router.push({name: 'tasks'})
-
       } catch (e) {
-        alert('Неверный логин или пароль')
+        console.log(e);
       }
     }
   }
